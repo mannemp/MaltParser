@@ -1,0 +1,13 @@
+Training set path:../../../data/ptb-wsj-npb-TrainDevel.dep.auto
+Size (tokens):983221
+Size (sentences):41178
+Non projective:7.703142454708825
+Dangling Punctuation:0
+LAS:87.57
+Default:85.72
+NumRootLabels:1
+JavaHeap:-Xmx20480m
+MaxTokens:2147483647
+CposEqPos:false
+LemmaBlank:false
+FeatsBlank:true

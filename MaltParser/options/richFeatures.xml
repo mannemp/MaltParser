@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<featuremodels>
+	<featuremodel name="richnivreeager">
+		<feature>Merge(InputColumn(FORM, Stack[0]), InputColumn(POSTAG, Stack[0]))</feature>
+		<feature>InputColumn(FORM, Stack[0])</feature>
+		<feature>InputColumn(POSTAG, Stack[0])</feature>
+		<feature>Merge(InputColumn(FORM, Input[0]), InputColumn(POSTAG, Input[0]))</feature>
+		<feature>InputColumn(FORM, Input[0])</feature>
+		<feature>InputColumn(POSTAG, Input[0])</feature>
+		<feature>Merge(InputColumn(FORM, Input[1]), InputColumn(POSTAG, Input[1]))</feature>
+		<feature>InputColumn(FORM, Input[1])</feature>
+		<feature>InputColumn(POSTAG, Input[1])</feature>
+		<feature>Merge(InputColumn(FORM, Input[2]), InputColumn(POSTAG, Input[2]))</feature>
+		<feature>InputColumn(FORM, Input[2])</feature>
+		<feature>InputColumn(POSTAG, Input[2])</feature>
+
+		<feature>Merge3(InputColumn(FORM,Stack[0]),InputColumn(POSTAG, Stack[0]), InputColumn(FORM, Input[0]))</feature>
+		<feature>Merge3(InputColumn(FORM,Stack[0]),InputColumn(FORM, Input[0]), InputColumn(POSTAG, Input[0]))</feature>
+		<feature>Merge3(InputColumn(FORM,Stack[0]),InputColumn(POSTAG, Stack[0]), InputColumn(POSTAG, Input[0]))</feature>
+		<feature>Merge3(InputColumn(POSTAG,Stack[0]),InputColumn(FORM, Input[0]), InputColumn(POSTAG, Input[0]))</feature>
+		<feature>Merge(InputColumn(FORM, Stack[0]), InputColumn(FORM, Input[0]))</feature>
+		<feature>Merge(InputColumn(POSTAG, Stack[0]), InputColumn(POSTAG, Input[0]))</feature>
+
+		<feature>Merge3(InputColumn(POSTAG,Input[0]),InputColumn(POSTAG, Input[1]), InputColumn(POSTAG, Input[2]))</feature>
+		<feature>Merge3(InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG, Input[0]), InputColumn(POSTAG, Input[1]))</feature>
+		<feature>Merge3(InputColumn(POSTAG,head(Stack[0])),InputColumn(POSTAG, Stack[0]), InputColumn(POSTAG, Input[0]))</feature>
+		<feature>Merge3(InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG, ldep(Stack[0])), InputColumn(POSTAG, Input[0]))</feature>
+		<feature>Merge3(InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG, rdep(Stack[0])), InputColumn(POSTAG, Input[0]))</feature>
+		<feature>Merge3(InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG, Input[0]), InputColumn(POSTAG, ldep(Input[0])))</feature>
+
+		<feature>Merge(InputColumn(FORM, Stack[0]), Distance(Stack[0], Input[0], 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(POSTAG, Stack[0]), Distance(Stack[0], Input[0], 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(FORM, Input[0]), Distance(Stack[0], Input[0], 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(POSTAG, Input[0]), Distance(Stack[0], Input[0], 0|1|2|5))</feature>
+		<feature>Merge3(InputColumn(FORM,Stack[0]),InputColumn(FORM, Input[0]), Distance(Stack[0], Input[0], 0|1|2|5))</feature>
+		<feature>Merge3(InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG, Input[0]), Distance(Stack[0], Input[0], 0|1|2|5))</feature>
+	
+		<feature>Merge(InputColumn(FORM, Stack[0]), NumOf(Stack[0], rdeps, 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(POSTAG, Stack[0]), NumOf(Stack[0], rdeps, 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(FORM, Stack[0]), NumOf(Stack[0], ldeps, 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(POSTAG, Stack[0]), NumOf(Stack[0], ldeps, 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(FORM, Input[0]), NumOf(Input[0], ldeps, 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(POSTAG, Input[0]), NumOf(Input[0], ldeps, 0|1|2|5))</feature>
+
+		<feature>InputColumn(FORM, head(Stack[0]))</feature>
+		<feature>InputColumn(POSTAG, head(Stack[0]))</feature>
+		<feature>OutputColumn(DEPREL, Stack[0])</feature>
+		<feature>InputColumn(FORM, ldep(Stack[0]))</feature>
+		<feature>InputColumn(POSTAG, ldep(Stack[0]))</feature>
+		<feature>OutputColumn(DEPREL, ldep(Stack[0]))</feature>
+		<feature>InputColumn(FORM, rdep(Stack[0]))</feature>
+		<feature>InputColumn(POSTAG, rdep(Stack[0]))</feature>
+		<feature>OutputColumn(DEPREL, rdep(Stack[0]))</feature>
+		<feature>InputColumn(FORM, ldep(Input[0]))</feature>
+		<feature>InputColumn(POSTAG, ldep(Input[0]))</feature>
+		<feature>OutputColumn(DEPREL, ldep(Input[0]))</feature>
+
+		<feature>InputColumn(FORM, head2(Stack[0]))</feature>
+		<feature>InputColumn(POSTAG, head2(Stack[0]))</feature>
+		<feature>OutputColumn(DEPREL, head(Stack[0]))</feature>
+		<feature>InputColumn(FORM, l2dep(Stack[0]))</feature>
+		<feature>InputColumn(POSTAG, l2dep(Stack[0]))</feature>
+		<feature>OutputColumn(DEPREL, l2dep(Stack[0]))</feature>
+		<feature>InputColumn(FORM, r2dep(Stack[0]))</feature>
+		<feature>InputColumn(POSTAG, r2dep(Stack[0]))</feature>
+		<feature>OutputColumn(DEPREL, r2dep(Stack[0]))</feature>
+		<feature>InputColumn(FORM, l2dep(Input[0]))</feature>
+		<feature>InputColumn(POSTAG, l2dep(Input[0]))</feature>
+		<feature>OutputColumn(DEPREL, l2dep(Input[0]))</feature>
+		<feature>Merge3(InputColumn(POSTAG, Stack[0]),InputColumn(POSTAG, ldep(Stack[0])),InputColumn(POSTAG, l2dep(Stack[0])))</feature>
+		<feature>Merge3(InputColumn(POSTAG, Stack[0]),InputColumn(POSTAG, rdep(Stack[0])),InputColumn(POSTAG, r2dep(Stack[0])))</feature>
+		<feature>Merge3(InputColumn(POSTAG, Stack[0]),InputColumn(POSTAG, head(Stack[0])),InputColumn(POSTAG, head2(Stack[0])))</feature>
+		<feature>Merge3(InputColumn(POSTAG, Input[0]),InputColumn(POSTAG, ldep(Input[0])),InputColumn(POSTAG, l2dep(Input[0])))</feature>
+
+		<feature>Merge(InputColumn(FORM, Stack[0]), LabelSetOf(Stack[0], rdeps))</feature>
+		<feature>Merge(InputColumn(POSTAG, Stack[0]), LabelSetOf(Stack[0], rdeps))</feature>
+		<feature>Merge(InputColumn(FORM, Stack[0]), LabelSetOf(Stack[0], ldeps))</feature>
+		<feature>Merge(InputColumn(POSTAG, Stack[0]), LabelSetOf(Stack[0], ldeps))</feature>
+		<feature>Merge(InputColumn(FORM, Input[0]), LabelSetOf(Input[0], ldeps))</feature>
+		<feature>Merge(InputColumn(POSTAG, Input[0]), LabelSetOf(Input[0], ldeps))</feature>
+	</featuremodel>
+</featuremodels>

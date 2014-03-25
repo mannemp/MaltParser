@@ -1,0 +1,4 @@
+java -jar MaltOptimizer.jar -p 1 -m maltparser-1.7.2.jar -c ../../../data/ptb-wsj-npb-train.dep.auto
+java -jar MaltOptimizer.jar -p 2 -m maltparser-1.7.2.jar -c ../../../data/ptb-wsj-npb-train.dep.auto
+java -jar MaltOptimizer.jar -p 3 -m maltparser-1.7.2.jar -c ../../../data/ptb-wsj-npb-train.dep.auto
+

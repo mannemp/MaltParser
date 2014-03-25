@@ -1,0 +1,15 @@
+----------
+** nivreeager-optimized-en-fulltrain is the semi-optimized (on devel data)
+model file ***
+$java -cp .:lib/log4j.jar:lib/libsvm.jar:lib/liblinear-1.8.jar:lib/trove.jar:dist/maltparser-1.7.2/classes/ org.maltparser.Malt -c nivreeager-optimized-en-fulltrain -i ../data/ptb-wsj-npb-devel.dep.auto  -o outputs/nivreeager-optimized-en-fulltrain.devel.auto.output -m parse
+  Labeled   attachment score: 28160 / 32873 * 100 = 85.66 %
+  Unlabeled attachment score: 29186 / 32873 * 100 = 88.78 %
+  Label accuracy score:       29732 / 32873 * 100 = 90.45 %
+----------
+
+Pruner training data -
+20G in size 
+1719729 ranking samples
+92 actions
+1.68 million features
+

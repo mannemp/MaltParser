@@ -1,0 +1,29 @@
+
+
+#---------------------------Start program.job------------------------
+#!/bin/bash
+
+# The job should be placed into the queue all.q.
+# -q all.q 
+#
+#Memory requirements
+#$ -l mem_free=25000M,virtual_free=25000M 
+
+# The batchsystem should use the current directory as working directory.
+# Both files (output.dat and error.dat) will be placed in the current
+# directory. The batchsystem assumes to find the executable in this directory.
+#$ -cwd 
+
+# This is my email address for notifications. I want to have all notifications
+# at the master node of this cluster.
+# -M mannemp@eecs.oregonstate.edu 
+
+#see where the job is being run
+hostname
+
+
+#$ -N optimize 
+java -jar MaltOptimizer.jar -p 1 -m maltparser-1.7.2.jar -c ../../../data/ptb-wsj-npb-TrainDevel.dep.auto
+java -jar MaltOptimizer.jar -p 2 -m maltparser-1.7.2.jar -c ../../../data/ptb-wsj-npb-TrainDevel.dep.auto
+java -jar MaltOptimizer.jar -p 3 -m maltparser-1.7.2.jar -c ../../../data/ptb-wsj-npb-TrainDevel.dep.auto
+

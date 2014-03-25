@@ -1,0 +1,5 @@
+*.mco
+bin/
+dist/
+jobs/
+docs/

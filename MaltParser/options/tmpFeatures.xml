@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<featuremodels>
+	<featuremodel name="richnivreeager">
+		<feature>Merge(InputColumn(FORM, Stack[0]), NumOf(Stack[0], rdeps, 0|1|2|5))</feature>
+		<feature>Merge(InputColumn(FORM, Stack[0]), LabelSetOf(Stack[0], rdeps))</feature>
+	</featuremodel>
+</featuremodels>

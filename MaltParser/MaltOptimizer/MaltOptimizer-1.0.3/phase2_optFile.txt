@@ -1,0 +1,4 @@
+1. root_label (-grl):ROOT
+2. covered_root (-pcr):none
+3. parsing_algorithm (-a):stackproj
+4. marking_strategy (-pp):head

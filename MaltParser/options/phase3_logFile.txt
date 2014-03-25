@@ -1,0 +1,15 @@
+Training set path:data/sample-train-optimize.txt
+Size (tokens):48019
+Size (sentences):1982
+Non projective:8.526740665993945
+Dangling Punctuation:0
+LAS:81.31
+Default:79.62
+NumRootLabels:1
+JavaHeap:-Xmx2048m
+MaxTokens:2147483647
+CposEqPos:false
+LemmaBlank:false
+FeatsBlank:true
+allow_root:true
+allow_reduce:false

@@ -1,0 +1,130 @@
+CONFIGURATION
+Configuration name:   pruneandscore-en-train
+Configuration type:   pruneandscore
+Created:              Thu Feb 20 16:53:45 PST 2014
+
+SYSTEM
+Operating system architecture: amd64
+Operating system name:         Linux
+JRE vendor name:               Sun Microsystems Inc.
+JRE version number:            1.6.0_27
+
+MALTPARSER
+Version:                       @version@
+Build date:                    @builddate@
+
+SETTINGS
+2planar
+  reduceonswitch (-2pr)                 false
+config
+  hcthreshold (-hct)                    -50000.0
+  hcgapthreshold (-hcgt)                 5000
+  precatk (-patk)                        4
+  workingdir (  -w)                     user.dir
+  name (  -c)                           pruneandscore-en-train
+  logging ( -cl)                        info
+  flowchart (  -m)                      plearn
+  hckbest (-hck)                        100
+  type (  -t)                           pruneandscore
+  logfile (-lfi)                        stdout
+  hcactionthreshold (-hcat)              -5000
+  url (  -u)                            
+covington
+  allow_root ( -cr)                     true
+  allow_shift ( -cs)                    false
+graph
+  max_sentence_length (-gsl)            256
+  head_rules (-ghr)                     
+  root_label (-grl)                     ROOT
+guide
+  decision_settings (-gds)              T.TRANS+A.DEPREL
+  kbest_type ( -kt)                     rank
+  data_split_structure (  -s)           
+  learner (  -l)                        libpruneandscore
+  kbest (  -k)                          -1
+  features (  -F)                       options/addMergPOSTAGI0FORMStack0.xml
+  classitem_separator (-gcs)            ~
+  data_split_column (  -d)              
+  data_split_threshold (  -T)           50
+input
+  infile (  -i)                         ../data/sample100.conll
+  reader ( -ir)                         tab
+  iterations ( -it)                     1
+  charset ( -ic)                        UTF-8
+  reader_options (-iro)                 
+  format ( -if)                         /appdata/dataformat/conllx.xml
+lib
+  save_instance_files ( -li)            true
+  external ( -lx)                       
+  verbosity ( -lv)                      silent
+  options ( -lo)                        -s_4_-c_0.1
+multiplanar
+  planar_root_handling (-prh)           normal
+nivre
+  allow_root ( -nr)                     false
+  allow_reduce ( -ne)                   true
+output
+  charset ( -oc)                        UTF-8
+  writer_options (-owo)                 
+  format ( -of)                         
+  writer ( -ow)                         tab
+  outfile (  -o)                        
+planar
+  no_covered_roots (-pcov)               false
+  connectedness (-pcon)                  none
+  acyclicity (-pacy)                     true
+pproj
+  covered_root (-pcr)                   none
+  marking_strategy ( -pp)               none
+  lifting_order (-plo)                  shortest
+pruneandscore
+  paspruneoptions (-paspop)                
+  pasprunek (-paspk)                      5
+  parsing_algorithm (  -a)              nivreeager
+  null_value ( -nv)                     one
+  guide_model ( -gm)                    single
+  propagation ( -fp)                    
+  passcoreoptions (-passop)                
+  diagnostics ( -di)                    false
+  use_partial_tree ( -up)               false
+  diafile (-dif)                        stdout
+  mode ( -sm)                           parse
+
+DEPENDENCIES
+--guide-features (  -F)                 addMergPOSTAGI0FORMStack0.xml
+
+FEATURE MODEL
+MAIN
+InputColumn(CPOSTAG,Input[0])
+InputColumn(CPOSTAG,Input[1])
+InputColumn(CPOSTAG,Stack[0])
+InputColumn(FORM,Input[0])
+InputColumn(FORM,Input[1])
+InputColumn(FORM,Stack[0])
+InputColumn(FORM,head(Stack[0]))
+InputColumn(LEMMA,Input[0])
+InputColumn(LEMMA,Stack[0])
+InputColumn(POSTAG,Input[0])
+InputColumn(POSTAG,Input[1])
+InputColumn(POSTAG,Input[2])
+InputColumn(POSTAG,Input[3])
+InputColumn(POSTAG,Stack[0])
+InputColumn(POSTAG,Stack[1])
+Merge(InputColumn(POSTAG,Input[0]),InputColumn(FORM,Input[1]))
+Merge(InputColumn(POSTAG,Input[0]),InputColumn(FORM,Stack[0]))
+Merge(InputColumn(POSTAG,Input[0]),OutputColumn(DEPREL,ldep(Input[0])))
+Merge(InputColumn(POSTAG,Stack[0]),InputColumn(FORM,Input[0]))
+Merge(InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG,Input[0]))
+Merge(InputColumn(POSTAG,Stack[0]),OutputColumn(DEPREL,Stack[0]))
+Merge3(InputColumn(POSTAG,Input[0]),InputColumn(POSTAG,Input[1]),InputColumn(POSTAG,Input[2]))
+Merge3(InputColumn(POSTAG,Input[1]),InputColumn(POSTAG,Input[2]),InputColumn(POSTAG,Input[3]))
+Merge3(InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG,Input[0]),InputColumn(POSTAG,Input[1]))
+Merge3(InputColumn(POSTAG,Stack[0]),OutputColumn(DEPREL,ldep(Stack[0])),OutputColumn(DEPREL,rdep(Stack[0])))
+Merge3(InputColumn(POSTAG,Stack[1]),InputColumn(POSTAG,Stack[0]),InputColumn(POSTAG,Input[0]))
+OutputColumn(DEPREL,Stack[0])
+OutputColumn(DEPREL,ldep(Input[0]))
+OutputColumn(DEPREL,ldep(Stack[0]))
+OutputColumn(DEPREL,rdep(Stack[0]))
+
+libpruneandscore INTERFACE
+-s 4 -c 0.1 -e 0.1 -B -1 
