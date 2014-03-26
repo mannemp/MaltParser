@@ -44,8 +44,8 @@
 	<property name="jar.dest" value="${dist.dir}/lib"/>
 
 	<!-- The jar file that the jar task will generate -->
-	<property name="jar.filename" value="maltparser-2.0.0-pas-stable.jar"/> 
-	<!-- <property name="jar.filename" value="maltparser-cmlWtAveragedByFinalNoOfSteps.jar"/> -->
+	<!-- <property name="jar.filename" value="maltparser-2.0.0-pas-stable.jar"/> --> 
+	<property name="jar.filename" value="maltparser-cmlWtAveragedByFinalNoOfSteps.jar"/>
 
 	<!-- Application data -->
 	<property name="appdata.src" value="appdata"/>
