@@ -153,6 +153,7 @@
 		   target="${javac.target}"
     	   debug="true" 
 		   debuglevel="source,lines,vars"> <!-- Added these two debug lines -->
+			 <!-- <compilerarg line="-Xlint -J-Xms2500m -J-Xmx5000m" /> -->
 			<classpath refid="compile.classpath"/>
 		</javac>
 	</target>
