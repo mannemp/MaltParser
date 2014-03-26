@@ -44,7 +44,7 @@
 	<property name="jar.dest" value="${dist.dir}/lib"/>
 
 	<!-- The jar file that the jar task will generate -->
-	<property name="jar.filename" value="maltparser-${version}.jar"/>
+	<property name="jar.filename" value="maltparser-2.0.0-pas-stable.jar"/>
 
 	<!-- Application data -->
 	<property name="appdata.src" value="appdata"/>
@@ -160,9 +160,9 @@
 	<!-- ================================================================= -->
 	<!-- Remove all generated (compiled) class files.                      -->
 	<!-- ================================================================= -->
-	<target name="clean" depends="init">
+	<!-- <target name="clean" depends="init">
 		<delete dir="${dist.dir}/" />
-	</target>
+	</target> -->
 
 	<!-- ================================================================= -->
 	<!-- Create maltparser-${version}.jar												     -->
@@ -262,7 +262,7 @@
 	<!-- Build a complete distribution. Results go to ${dist.images}       -->
 	<!-- ================================================================= -->
 	<!-- <target name="dist" depends="init, clean, javadoc, jar, site"> -->
-	<target name="dist" depends="init, clean, jar"> <!-- removed site-->
+	<target name="dist" depends="init, jar"> <!-- removed clean, site-->
 <!--		<mkdir  dir="${dist.images}" />
 
 		<mkdir  dir="${dist.tmp}/maltparser-${version}" />
