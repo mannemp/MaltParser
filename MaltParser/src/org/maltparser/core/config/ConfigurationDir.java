@@ -1140,8 +1140,8 @@ public class ConfigurationDir  {
 		File newMcoPath = new File(workingDirectory.getPath()+File.separator+getName()+"."+SystemInfo.getVersion().trim()+".mco");
 		Versioning versioning = new Versioning(name, type, mcoPath, createdByMaltParserVersion);
 		if (!versioning.support(createdByMaltParserVersion)) {
-			SystemLogger.logger().warn("The parser model '"+ name+ ".mco' is created by MaltParser "+getCreatedByMaltParserVersion()+", which cannot be converted to a MaltParser "+SystemInfo.getVersion()+" parser model.\n");
-			SystemLogger.logger().warn("Please retrain the parser model with MaltParser "+SystemInfo.getVersion() +" or download MaltParser "+getCreatedByMaltParserVersion()+" from http://maltparser.org/download.html\n");
+			SystemLogger.logger().info("The parser model '"+ name+ ".mco' is created by MaltParser "+getCreatedByMaltParserVersion()+", which cannot be converted to a MaltParser "+SystemInfo.getVersion()+" parser model.\n");
+			SystemLogger.logger().info("Please retrain the parser model with MaltParser "+SystemInfo.getVersion() +" or download MaltParser "+getCreatedByMaltParserVersion()+" from http://maltparser.org/download.html\n");
 			return;
 		}
 		SystemLogger.logger().info("Converts the parser model '"+ mcoPath.getName()+ "' into '"+newMcoPath.getName()+"'....\n");
