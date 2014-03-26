@@ -2,4 +2,5 @@
 bin/
 jobs/
 docs/
-jars/lib
+jars/
+build.xml
