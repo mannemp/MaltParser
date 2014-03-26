@@ -45,7 +45,7 @@
 
 	<!-- The jar file that the jar task will generate -->
 	<!-- <property name="jar.filename" value="maltparser-2.0.0-pas-stable.jar"/> --> 
-	<property name="jar.filename" value="maltparser-cmlWtAveragedByFinalNoOfSteps.jar"/>
+ 	<property name="jar.filename" value="maltparser-cmlWtAveragedByFinalNoOfSteps.jar"/>
 
 	<!-- Application data -->
 	<property name="appdata.src" value="appdata"/>
@@ -153,6 +153,7 @@
 		   target="${javac.target}"
     	   debug="true" 
 		   debuglevel="source,lines,vars"> <!-- Added these two debug lines -->
+			 <!-- <compilerarg line="-Xlint -J-Xms2500m -J-Xmx5000m" /> -->
 			<classpath refid="compile.classpath"/>
 		</javac>
 	</target>
