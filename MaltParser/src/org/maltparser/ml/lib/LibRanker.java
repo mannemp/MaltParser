@@ -29,11 +29,6 @@ import org.maltparser.core.helper.Util;
 import org.maltparser.core.symbol.SymbolTable;
 import org.maltparser.parser.guide.instance.InstanceModel;
 
-import ciir.umass.edu.learning.DataPoint;
-import ciir.umass.edu.learning.DenseDataPoint;
-import ciir.umass.edu.learning.RankList;
-import ciir.umass.edu.learning.SparseDataPoint;
-
 public class LibRanker extends Lib {
 	
 	public LibRanker(InstanceModel owner, Integer learnerMode) throws MaltChainedException {
@@ -318,7 +313,7 @@ public class LibRanker extends Lib {
 	}
 
 	
-	private List<RankList> readProblem(InputStreamReader isr) throws MaltChainedException {
+	/*private List<RankList> readProblem(InputStreamReader isr) throws MaltChainedException {
 		
 		final FeatureList featureList = new FeatureList();
 		if (configLogger.isInfoEnabled()) {
@@ -375,7 +370,7 @@ public class LibRanker extends Lib {
 		
 		return samples;
 	}
-	
+	*/
 	protected int binariesInstance(String line, FeatureList featureList) throws MaltChainedException {
 		int y = -1; 
 		featureList.clear();

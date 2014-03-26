@@ -42,10 +42,6 @@ import org.maltparser.parser.guide.instance.InstanceModel;
 import org.maltparser.parser.history.action.SingleDecision;
 import org.maltparser.parser.pruneandscore.PruneAndScore;
 
-import ciir.umass.edu.learning.DataPoint;
-import ciir.umass.edu.learning.RankList;
-import ciir.umass.edu.learning.SparseDataPoint;
-
 public abstract class Lib implements LearningMethod {
 	protected Verbostity verbosity;
 	public enum Verbostity {
@@ -226,7 +222,7 @@ public abstract class Lib implements LearningMethod {
 		String decisionSettings = getConfiguration().getOptionValue("guide", "decision_settings").toString().trim();
 		SymbolTable actionTable = getConfiguration().getSymbolTables().getSymbolTable(decisionSettings);
 		
-		List<RankList> samples = new ArrayList<RankList>();
+//		List<RankList> samples = new ArrayList<RankList>();
 		
 		String[] columns = tabPattern.split(line);
 		int trueCode = Integer.parseInt(columns[0]);
@@ -265,7 +261,7 @@ public abstract class Lib implements LearningMethod {
 		return rl.toString();
 	}
 
-	public void populateRankList(String[] lines, List<RankList> samples)
+	/*public void populateRankList(String[] lines, List<RankList> samples)
 	{
 		int countRL = 0;
 		int countEntries = 0;
@@ -318,7 +314,7 @@ public abstract class Lib implements LearningMethod {
 
 		return;
 	}
-	
+	*/
 	protected int binariesInstanceWithLabel(String line, FeatureList featureList, boolean gold) throws MaltChainedException {
 		int y = -1; 
 		featureList.clear();

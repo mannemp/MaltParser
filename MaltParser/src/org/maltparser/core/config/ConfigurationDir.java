@@ -45,8 +45,6 @@ import org.maltparser.core.symbol.SymbolTableHandler;
 import org.maltparser.core.symbol.trie.TrieSymbolTableHandler;
 import org.maltparser.parser.pruneandscore.DirectoryUtils;
 
-import ciir.umass.edu.utilities.FileUtils;
-
 
 /**
 * This class contains methods for handle the configuration directory.

@@ -5,7 +5,7 @@
 <!-- ================================================================= -->
 <!-- NOTE: all directories are relative to maltparser-{version}/             -->
 <!-- ================================================================= -->
-<project name="maltparser" default="usage" basedir=".">
+<project name="maltparser" default="dist" basedir=".">
 	<!-- The build.properties file defines the path to local jar files -->
 	<property file="build.properties"/>
 
@@ -28,8 +28,8 @@
 	<property name="java.source.dir" value="src/"/>
 	<property name="java.source.examples.dir" value="examples/apiexamples/srcex/"/>
 
-	<!-- distribution directory -->
-	<property name="dist.dir" value="dist/maltparser-${version}"/>
+	<!-- distribution directory dist/maltparser-${version}-->
+	<property name="dist.dir" value="jars"/>
 
 	<!-- plugin directory -->
 	<property name="plugin.dir" value="${dist.dir}/plugin"/>
@@ -40,6 +40,7 @@
 	<property name="dist.images" value="${dist.dir}/images"/>
 
 	<!-- Destination for generated jar files -->
+	<property name="jar.src" value="lib"/>
 	<property name="jar.dest" value="${dist.dir}/lib"/>
 
 	<!-- The jar file that the jar task will generate -->
@@ -126,10 +127,20 @@
 		    </filterset>
 		</copy>
 	</target>
-		
-	<target name="build" depends="init,appdata">
+	
+	<target name="libfiles">
+			<copy todir="${javac.dest}">
+				<fileset dir="${base}" includes="${jar.src}/**" />
+			    <filterset>
+			    	<filter token="version" value="${version}"/>
+			    	<filter token="builddate" value="${TODAY}"/>
+			    </filterset>
+			</copy>
+	</target>
+	
+	<target name="build" depends="init,appdata,libfiles">
 		<mkdir dir="${javac.dest}" />
-		<mkdir dir="${plugin.dir}" />
+		<!-- <mkdir dir="${plugin.dir}" /> -->
 
 		<javac srcdir="${java.source.dir}"
            destdir="${javac.dest}"
@@ -139,7 +150,8 @@
            fork="${javac.fork}"
            deprecation="${deprecation}"
 		   target="${javac.target}"
-           debug="${javac.debug}">
+    	   debug="true" 
+		   debuglevel="source,lines,vars"> <!-- Added these two debug lines -->
 			<classpath refid="compile.classpath"/>
 		</javac>
 	</target>
@@ -166,18 +178,25 @@
 		<copy file="${liblinear.jar}" tofile="${jar.dest}/liblinear-1.8.jar"/>
 		<copy file="${trove.jar}" tofile="${jar.dest}/trove.jar"/>
 		<jar jarfile="${dist.dir}/${jar.filename}" basedir="${javac.dest}"
-         includes="${stem}/**/*.class,appdata/**/*.*"
+         includes="${stem}/**/*.class,appdata/**/*.*,lib/**/*.jar"
          manifest="${dist.dir}/MANIFEST.MF">
+			<fileset dir="${java.source.dir}" /> <!-- Attaching source -->
 			<metainf dir="." includes="LICENSE, NOTICE, README"/>
+			<!-- <zipgroupfileset dir="lib" includes="*.jar"/> -->
 		</jar>
-		<delete file="${dist.dir}/MANIFEST.MF"/>
+		<delete file="${dist.dir}/MANIFEST.MF" />
+		<delete dir="${docs.dest}" />
+		<delete dir="${javac.dest}" />
 	</target>
 
 	<target name="prejar" depends="build">
 		<mkdir dir="${jar.dest}"/>
 		<filter token="version" value="${version}" />
+		 <!-- <manifestclasspath property="jar.classpath" jarfile="${dist.dir}/${jar.filename}">
+		      <classpath refid="compile.classpath"/>
+		 </manifestclasspath> -->	
 		<manifest file="${dist.dir}/MANIFEST.MF">
-			<attribute name="Class-Path" value="lib/log4j.jar lib/libsvm.jar lib/liblinear-1.8.jar lib/trove.jar "/>
+			<attribute name="Class-Path" value="lib/log4j.jar lib/libsvm.jar lib/liblinear-1.8.jar lib/trove.jar "/> 
 			<attribute name="Main-Class" value="org.maltparser.Malt"/>
 			<attribute name="Implementation-Title" value="MaltParser"/>
 			<attribute name="Implementation-Version" value="${version}"/>
@@ -243,8 +262,8 @@
 	<!-- Build a complete distribution. Results go to ${dist.images}       -->
 	<!-- ================================================================= -->
 	<!-- <target name="dist" depends="init, clean, javadoc, jar, site"> -->
-	<target name="dist" depends="init, clean, jar, site">
-		<mkdir  dir="${dist.images}" />
+	<target name="dist" depends="init, clean, jar"> <!-- removed site-->
+<!--		<mkdir  dir="${dist.images}" />
 
 		<mkdir  dir="${dist.tmp}/maltparser-${version}" />
 
@@ -280,7 +299,7 @@
 		<zip zipfile="${dist.images}/maltparser-${version}.zip"
          basedir="${dist.tmp}"
          includes="maltparser-${version}/**" />
-		<delete dir="${dist.tmp}" />
+		<delete dir="${dist.tmp}" /> -->
 	</target>
 
 </project>
