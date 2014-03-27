@@ -161,6 +161,10 @@
 			<code>-u http://maltparser.org/mco/test.mco</code>.]]></desc>
 			<shortdesc>URL to configuration file</shortdesc>
 		</option>
+		<option type="bool" name="saveconfigaftereachiter" flag="scai" default="false" usage="both">
+			<desc><![CDATA[ If <i>true</i> ,then saves config (and model) after each iteration during training. By default this option is false.  ]]></desc>
+			<shortdesc>diagnostics</shortdesc>
+		</option>
 		<option type="integer" name="precatk" flag="patk" default="4" usage="both">
 			<shortdesc>Precision at Top K for Prune-and-Score.</shortdesc>
 		</option>
