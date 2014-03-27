@@ -51,8 +51,8 @@ public class PWeight implements Serializable{
 	}
     
     public double returnCmlwt(int allround){
-//    	return (cmlwt/(double)allround); ///allround;
-    	return (cmlwt + (allround - update) * weight); ///allround;
+    	return (cmlwt/(double)allround); ///allround;
+//    	return (cmlwt + (allround - update) * weight); ///allround;
     }
     
     public double averagaParam(double para)
