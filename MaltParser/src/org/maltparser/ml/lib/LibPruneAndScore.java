@@ -58,20 +58,8 @@ public class LibPruneAndScore extends Lib {
 		exploreProb = ((PruneAndScore)getConfiguration()).getExploreProb();
 		
 		try{
-			// The following two are Not being used 
+			// The following two are empty 
 			String prepSuffix = "", preSuffix= "";
-			if(getConfiguration().getOptionValue("pruneandscore","pasusemodeliter") !=null){
-				String pk = getConfiguration().getOptionValue("pruneandscore", "pasusemodeliter").toString();
-				int iter = Integer.parseInt(pk);
-				if(iter != -1)
-					preSuffix = ".i"+iter;
-			}
-			if(getConfiguration().getOptionValue("pruneandscore","pasusepmodeliter") !=null){
-				String pk = getConfiguration().getOptionValue("pruneandscore", "pasusepmodeliter").toString();
-				int iter = Integer.parseInt(pk);
-				if(iter != -1)
-					prepSuffix = ".i"+iter;
-			}
 			
 			if(getLibMode() == LEARN)
 			{

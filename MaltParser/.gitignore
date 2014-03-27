@@ -5,3 +5,9 @@ docs/
 jars/
 build.xml
 build.properties
+scripts/
+options
+/outputs
+/notes.txt
+/appdata
+/data
