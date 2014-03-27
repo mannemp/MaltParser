@@ -240,26 +240,22 @@ public class CVPerceptronModel  implements Serializable {
     	if(found)
     		return bestAllowedCode;
     	
+    	/** Let bestPredictedCode be the highest scoring action according to the model
+    	 * and not the lowest cost action according to the goldGraph
+    	**/
     	int bestPredictedCode = predictionList[0];
 		double bestPredictedCodeScore = getScore(actionFeats.get(predictionList[0])); 
-		int bestPredictedCodeCost = actionCosts.get(predictionList[0]).intValue();
+//		int bestPredictedCodeCost = actionCosts.get(predictionList[0]).intValue();
 		for(int i = 1 ; i < getK() && i < predictionList.length; i++)
 		{
 			int pcode = predictionList[i];
-			if(actionCosts.get(pcode) < bestPredictedCodeCost)
+			//if(actionCosts.get(pcode) < bestPredictedCodeCost)
+			double pscore = getScore(actionFeats.get(pcode)) ; 
+			if(pscore > bestPredictedCodeScore)
 			{
 				bestPredictedCode = pcode;
-				bestPredictedCodeCost = actionCosts.get(pcode).intValue();
-				bestPredictedCodeScore = getScore(actionFeats.get(pcode));
-			}
-			else if(actionCosts.get(pcode).intValue() == bestPredictedCodeCost)
-			{
-				double curScore = getScore(actionFeats.get(pcode));
-				if(bestPredictedCodeScore < curScore)
-				{
-					bestPredictedCode = pcode;
-					bestPredictedCodeScore = curScore;
-				}
+//				bestPredictedCodeCost = actionCosts.get(pcode).intValue();
+				bestPredictedCodeScore = pscore;
 			}
 		}
 		allround ++;
