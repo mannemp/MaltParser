@@ -140,8 +140,10 @@ public class PruneAndScoreChartItem extends ChartItem {
 			{
 					//TODO: store models to ".i"+iteration
 //					pruneAndScore.getGuide().saveModel(".i"+(curIter-1));
-					pruneAndScore.getGuide().saveModel("");
-					createConfigFile(curIter);
+					if (OptionManager.instance().getOptionValue(getOptionContainerIndex(), "config", "saveconfigaftereachiter").toString().equals("true")) {
+						pruneAndScore.getGuide().saveModel("");
+						createConfigFile(curIter);
+					}
 					/*pruneAndScore.evaluator.reset();
 					pruneAndScore.evaluator.printMetrics();
 					System.out.println("ITERATION:"+(actualIter-1));
