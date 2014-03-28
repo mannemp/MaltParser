@@ -289,7 +289,11 @@ public class LibPruneAndScore extends Lib {
 						topKActions[i] = prunedActions[i];
 
 					if(curIter%2 == 1)
+					{
 						nextAction = ((MaltPerceptronModel)pmodel).train(actionCosts,mfns,curIter);
+						if(curIter != 1)
+							nextAction = ((MaltPerceptronModel)model).predict(mfns, topKActions, false)[0];
+					}
 					else
 						nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,topKActions,curIter);
 				}
