@@ -354,6 +354,20 @@ public class ManageCVPerceptron  extends MaltPerceptronModel implements Serializ
 		return null;
 	}
 
+	@Override
+	public int[] predict(MaltFeatureNode[] x, int[] prunedActionList,
+			boolean cmltWts) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double[][] scorePredict(MaltFeatureNode[] x, int[] prunedActionList,
+			boolean cmltWts) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
 

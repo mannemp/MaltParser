@@ -267,7 +267,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
     
     public int train(HashMap<Integer, Integer> actionCosts, MaltFeatureNode[] x, int[] prunedList, int curIter) throws MaltChainedException {
 		
-    	double[][] scoreList = scorePredict(x,false);
+    	double[][] scoreList = scorePredict(x,prunedList,false);
 
     	// get Top Oracle Action
     	int bestAllowedAction = prunedList[0];
@@ -309,49 +309,54 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 		/*if(bestAllowedCodeCost != 0)
 			System.err.println("Can't find a 0 cost action");*/
 		
-		// get Top Predicted Action in prunedList
-    	int bestPredictedAction = prunedList[0];
-    	for(int i = 0; i < scoreList[0].length && i < getK(); i++)
+		// Get topK predictions
+		ArrayList<Integer> prunedPredictions = new ArrayList<Integer>();
+		for(int i = 0; i < scoreList[0].length && prunedPredictions.size() <= getK(); i++)
+			prunedPredictions.add((int)scoreList[0][i]);
+		
+		// get least cost Predicted Action in topKPredictions
+    	int bestPredictedAction = prunedPredictions.get(0).intValue();
+    	int bestPredictionCost = actionCosts.get(bestPredictedAction);
+    	for(int i = 1; i < prunedPredictions.size(); i++)
     	{
-    		for(int pcode : prunedList)
-    		{
-    			if(pcode == (int)scoreList[0][i] )
-    			{
-    				if(actionCosts.get(pcode) == bestAllowedCodeCost)
-    				{
-    					bestPredictedAction = pcode;
-    					i = scoreList[0].length;
-    				}
-    				break;
-    			}
-    		}
+    		int pcode = prunedPredictions.get(i).intValue();
+			if(actionCosts.get(pcode) < bestPredictionCost)
+			{
+				bestPredictedAction = pcode;
+				bestPredictionCost = actionCosts.get(bestPredictedAction);
+			}
     	}
 
     	// < is not needed !! 
-    	if(actionCosts.get(bestPredictedAction).intValue() == actionCosts.get(bestAllowedAction).intValue()) 
+//    	if(actionCosts.get(bestPredictedAction).intValue() == actionCosts.get(bestAllowedAction).intValue())
+    	if(bestPredictionCost <= bestAllowedCodeCost)
     		return bestPredictedAction;
     	// else i.e. predictedAction's cost is greater than that of bestAllowedCode
     	
     	allround ++;
     	FeatureList goldFeats = new FeatureList();
 		binarizeFVWithAction(x, bestAllowedAction, goldFeats, true);
-		updateFeats(goldFeats, +1.0, allround);
-
-		FeatureList feats = new FeatureList();
-		binarizeFVWithAction(x, bestPredictedAction, feats, false);
-		updateFeats(feats, -1.0, allround);
 		
-		double gscore = getScore(goldFeats);
-		double pscore = getScore(feats);
-		pscore+=0;
-    	
+		for(int i = 0; i < prunedPredictions.size(); i++)
+		{
+			updateFeats(goldFeats, +1.0, allround);
+			
+			int pcode = prunedPredictions.get(i).intValue();
+			FeatureList feats = new FeatureList();
+			binarizeFVWithAction(x, pcode, feats, false);
+			updateFeats(feats, -1.0, allround);
+			
+			double gscore = getScore(goldFeats);
+			double pscore = getScore(feats);
+			pscore+=0;
+		}
 		return explore(bestAllowedAction,bestPredictedAction,curIter);
 	}
 
     public int explore(int topOracleAction, int bestPredictedAction, int curIter)
     {
     	
-    	if(curIter+1 > exploreAfterMIter && random.nextDouble() < exploreProb)
+    	if(curIter > exploreAfterMIter && random.nextDouble() < exploreProb)
     		return bestPredictedAction;
     	else
     		return topOracleAction;
@@ -458,18 +463,24 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 
     @Override
 	public int[] predict(MaltFeatureNode[] x, boolean cmlWts) {
+		return predict(x,getActionCodes(),cmlWts);
+	}
+    
+    @Override
+	public int[] predict(MaltFeatureNode[] x,int[] prunedActionList, boolean cmlWts) {
 		// DONE: Auto-generated method stub
 		try {
 			/*String decisionSettings = owner.getConfiguration().getOptionValue("guide", "decision_settings").toString().trim();
 			SymbolTable actionTable = owner.getConfiguration().getSymbolTables().getSymbolTable(decisionSettings);
 			noOfActions = actionTable.size();*/
-			double[] actionScores = new double[noOfActions];
-			int[] predictionList = new int[noOfActions];
+
+			double[] actionScores = new double[prunedActionList.length];
+			int[] predictionList = new int[prunedActionList.length];
 //			MaltFeatureNode[][] binarizedActionMFNs = new MaltFeatureNode[actionTable.getCodes().size()][x.length];
 		
 			int k = 0; 
 //			for(int code: actionTable.getCodes())
-			for(int code:actionCodes)
+			for(int code:prunedActionList)
 			{
 				FeatureList feats = new FeatureList();
 				binarizeFVWithAction(x, code, feats, false);
@@ -484,9 +495,9 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 			int tmpObj;
 			int lagest;
 			
-			for (int i=0; i < noOfActions-1; i++) {
+			for (int i=0; i < prunedActionList.length-1; i++) {
 				lagest = i;
-				for (int j=i; j < noOfActions; j++) {
+				for (int j=i; j < prunedActionList.length; j++) {
 					if (actionScores[j] > actionScores[lagest]) {
 						lagest = j;
 					}
@@ -506,20 +517,22 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 		return null;
 	}
 
-	@Override
-	public double[][] scorePredict(MaltFeatureNode[] x, boolean cmlWts) {
+    
+    @Override
+	public double[][] scorePredict(MaltFeatureNode[] x, int[] prunedActionList, boolean cmlWts) {
 		// DONE: Auto-generated method stub
-		int len = getK() > getActionCodes().length ? getActionCodes().length : getK();
-    	double[] actionScores = new double[noOfActions];
+//		int len = getK() > getActionCodes().length ? getActionCodes().length : getK();
+		int len = prunedActionList.length;
+    	double[] actionScores = new double[prunedActionList.length];
     	final double[][] scoredPredictions = new double[2][len];
-    	int[] predictionList = new int[noOfActions];
+    	int[] predictionList = new int[prunedActionList.length];
 		try {
 			/*String decisionSettings = owner.getConfiguration().getOptionValue("guide", "decision_settings").toString().trim();
 			SymbolTable actionTable = owner.getConfiguration().getSymbolTables().getSymbolTable(decisionSettings);*/
 //			MaltFeatureNode[][] binarizedActionMFNs = new MaltFeatureNode[actionTable.getCodes().size()][x.length];
 		
 			int k = 0;
-			for(int code: actionCodes)
+			for(int code: prunedActionList)
 			{
 				FeatureList feats = new FeatureList();
 				binarizeFVWithAction(x, code, feats, false);
@@ -535,9 +548,9 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 			int tmpObj;
 			int lagest;
 			
-			for (int i=0; i < noOfActions-1; i++) {
+			for (int i=0; i < prunedActionList.length-1; i++) {
 				lagest = i;
-				for (int j=i; j < noOfActions; j++) {
+				for (int j=i; j < prunedActionList.length; j++) {
 					if (actionScores[j] > actionScores[lagest]) {
 						lagest = j;
 					}
@@ -563,17 +576,22 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 		}
 		return scoredPredictions;
 	}
-
+    
 	@Override
-	public int[] predict(MaltFeatureNode[] x) {
-		// TODO Auto-generated method stub
-		return null;
+	public double[][] scorePredict(MaltFeatureNode[] x, boolean cmlWts) {
+		return scorePredict(x,getActionCodes(),cmlWts);
 	}
 
 	@Override
-	public double[][] scorePredict(MaltFeatureNode[] x) {
+	public int[] predict(MaltFeatureNode[] x) { // NEVER CALLED
 		// TODO Auto-generated method stub
-		return null;
+		return predict(x,false);
+	}
+
+	@Override
+	public double[][] scorePredict(MaltFeatureNode[] x) { // NEVER CALLED
+		// TODO Auto-generated method stub
+		return scorePredict(x, false);
 	}
 
 	

@@ -83,7 +83,7 @@ public class LibPruneAndScore extends Lib {
 			    	input.close();
 			    }
 			}
-			else if (getLibMode() == PRUNEANDSCORE)
+			else if (getLibMode() == PRUNEANDSCORE || getLibMode() == PEVAL)
 			{
 				ObjectInputStream pinput = new ObjectInputStream(getInputStreamFromConfigFileEntry(prepSuffix+".pmoo"));
 			    try {
@@ -252,7 +252,10 @@ public class LibPruneAndScore extends Lib {
 				if(permissible(code.intValue()))
 					permissibleActions.add(code.intValue());
 			// set permissible actions to the model
-			((MaltPerceptronModel)curModel).setActionCodes(permissibleActions);
+			if(model != null)
+				((MaltPerceptronModel)model).setActionCodes(permissibleActions);
+			if(pmodel != null)
+				((MaltPerceptronModel)pmodel).setActionCodes(permissibleActions);
 //			String actionSymbol = actionTable.getSymbolCodeToString(3);//getConfiguration().getGuide().getHistory().
 			((MaltPerceptronModel)curModel).setCurrentSentNo(getCurrentSentNo());
 			
@@ -266,22 +269,27 @@ public class LibPruneAndScore extends Lib {
 				actionCosts.put(code, cost);
 			}
 
-			int[] prunedActions = new int[permissibleActions.size()];
+			// Initialize topKActions to all permissible actions
+			int[] topKActions = new int[permissibleActions.size()];
 			int l = 0;
 			for(Integer code: permissibleActions)
-				prunedActions[l++] = code.intValue();
+				topKActions[l++] = code.intValue();
 			
-
+			MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 			if(getLibMode() != PEVAL)
 			{ // training
-
-				MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
-				if(getLibMode() == SLEARN)
+				
+				if(getLibMode() == SLEARN || getLibMode() == PLEARN)
 				{
-					prunedActions = pmodel.predict(mfns,false);
+					int[] prunedActions = pmodel.predict(mfns,false);
+					int len = pmodel.getK() > prunedActions.length ? prunedActions.length : pmodel.getK();
+					topKActions = new int[len];
+					for(int i = 0; i < len ; i++)
+						topKActions[i] = prunedActions[i];
+
 					int nextAction = ((MaltPerceptronModel)pmodel).train(actionCosts,mfns,curIter);
 				}
-				int nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,prunedActions,curIter);
+				int nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,topKActions,curIter);
 				
 //				if(actionCosts.get(decision.getDecisionCode()).intValue() !=0)
 					decision.addDecision(nextAction);
@@ -291,13 +299,18 @@ public class LibPruneAndScore extends Lib {
 			}
 			else if(getLibMode() == PEVAL)
 			{ 
-				prunedActions = predictPrune(featureVector);
+				int[] prunedActions = pmodel.predict(mfns,false);
+				int len = pmodel.getK() > prunedActions.length ? prunedActions.length : pmodel.getK();
+				topKActions = new int[len];
+				for(int i = 0; i < len ; i++)
+					topKActions[i] = prunedActions[i];
+
 				
 				int bestAllowedCode = prunedActions[0];
 				double bestAllowedCodeScore = Double.NEGATIVE_INFINITY; 
 				int bestAllowedCodeCost = Integer.MAX_VALUE;
 				
-				for(int code:prunedActions)
+				for(int code:topKActions)
 				{
 					if(actionCosts.get(code).intValue() < bestAllowedCodeCost)
 					{
@@ -332,6 +345,8 @@ public class LibPruneAndScore extends Lib {
 		}
 	}
 	
+	/** NOT CORRECT. IS NOT BEING CALLED AT ALL.
+	 **/
 	@Override
 	public void addInstance(SingleDecision decision, FeatureVector featureVector) throws MaltChainedException {
 		if (featureVector == null) {
@@ -352,7 +367,7 @@ public class LibPruneAndScore extends Lib {
 			final int n = featureVector.size();
 			
 			int[] prunedActions = ((MaltPerceptronModel)curModel).getActionCodes();
-			if(getLibMode() == SLEARN || getLibMode() == PEVAL || (getLibMode() == PLEARN && curIter%2 ==0))
+			if(getLibMode() == SLEARN || getLibMode() == PEVAL || getLibMode() == PLEARN )
 				prunedActions = predictPrune(featureVector);
 			
 			if(getLibMode() == PEVAL || (getLibMode() == PLEARN && curIter%2 ==0))
@@ -538,31 +553,15 @@ public class LibPruneAndScore extends Lib {
 		}
 		MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 		try {
-			int[] pruneList = new int[0];
-			pruneList = pmodel.predict(mfns,true);//scorePredict(mfns);
-			double[][] scoreList = new double[2][0]; 
-			scoreList = model.scorePredict(mfns,true);
+			int[] prunedActions = pmodel.predict(mfns,false);
+			int len = pmodel.getK() > prunedActions.length ? prunedActions.length : pmodel.getK();
+			int[] topKActions = new int[len];
+			for(int i = 0; i < len ; i++)
+				topKActions[i] = prunedActions[i];
 			
-			int len = pmodel.getK() > pruneList.length ? pruneList.length : pmodel.getK();
-
-			int[] finalList = new int[len];
-			int k = 0;
-			for(int i = 0 ; k < len && i < scoreList[0].length; i++)
-			{
-//				if(Arrays.asList(pruneList[0]).contains(scoreList[0][i]))
-//				for(double pcode : pruneList[0])
-				for(int pcode : pruneList)
-					if(Double.compare((double)pcode, scoreList[0][i]) == 0)
-						finalList[k++] = (int)scoreList[0][i];
-			}
-			/*int[] retList = new int[scoreList[0].length];
-			k = 0;
-			for(double code:scoreList[0])
-				retList[k++] = (int)code;*/
-			/*int[] retList = new int[k];
-			System.arraycopy( scoreList[0], 0, retList, 0, k );*/
-			return finalList;
-//			return retList;
+			int[] pasActions = ((MaltPerceptronModel)model).predict(mfns,topKActions,true);
+			
+			return pasActions;
 		} catch (OutOfMemoryError e) {
 			throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
 		}
@@ -599,30 +598,8 @@ public class LibPruneAndScore extends Lib {
 		}
 		MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 		try {
-			double[][] scoreList = model.scorePredict(mfns,true);
-			/*System.err.println(Arrays.toString(mfns));
-			System.err.println("Actions:"+Arrays.toString(scoreList[0]));
-			System.err.println("Scores :"+Arrays.toString(scoreList[1]));*/
-			/*scoreList = model.scorePredict(mfns,false);
-			System.err.println("Actions:"+Arrays.toString(scoreList[0]));
-			System.err.println("Scores :"+Arrays.toString(scoreList[1]));*/
-	/*		int[] finalList = new int[pruneTopK];
-			int k = 0;
-			for(int i = 0 ; k < pruneTopK && i < scoreList[0].length; i++)
-			{
-//				if(Arrays.asList(pruneList[0]).contains(scoreList[0][i]))
-				for(double pcode : pruneList[0])
-					if(Double.compare(pcode, scoreList[0][i]) == 0)
-						finalList[k++] = (int)scoreList[0][i];
-			}*/
-			int[] retList = new int[scoreList[0].length];
-			int k = 0;
-			for(double code:scoreList[0])
-				retList[k++] = (int)code;
-			/*int[] retList = new int[k];
-			System.arraycopy( scoreList[0], 0, retList, 0, k );*/
-//			return finalList;
-			return retList;
+			int[] predList = model.predict(mfns,true);
+			return predList;
 		} catch (OutOfMemoryError e) {
 			throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
 		}
@@ -638,16 +615,12 @@ public class LibPruneAndScore extends Lib {
 		}
 		MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 		try {
-			double[][] pruneList = pmodel.scorePredict(mfns,true);
-			int len = pmodel.getK() > pruneList[0].length ? pruneList[0].length : pmodel.getK();
-			int[] finalList = new int[len];
-			int k = 0;
-			for(int i = 0 ; i < len; i++)
-			{
-//				if(permissible((int)pruneList[0][i]))
-				finalList[k++] = (int)pruneList[0][i];
-			}
-			return finalList;
+			int[] prunedActions = pmodel.predict(mfns,false);
+			int len = pmodel.getK() > prunedActions.length ? prunedActions.length : pmodel.getK();
+			int[] topKActions = new int[len];
+			for(int i = 0; i < len ; i++)
+				topKActions[i] = prunedActions[i];
+			return topKActions;
 		} catch (OutOfMemoryError e) {
 			throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
 		}
@@ -714,58 +687,9 @@ public class LibPruneAndScore extends Lib {
 				saveFeatureMap(new BufferedOutputStream(new FileOutputStream(getFile(".pmap").getAbsolutePath())), featureMap);
 			else
 				saveFeatureMap(new BufferedOutputStream(new FileOutputStream(getFile(".map").getAbsolutePath())), featureMap);*/
+			saveModel("");
 		}
 		catch(Exception e){}
-		if (getLibMode() == LearningMethod.PLEARN && pmodel != null) {
-			try {
-				if (configLogger.isInfoEnabled()) {
-//					configLogger.info("Creating Libperceptron model "+getConfigNameFile(".pmoo").getCanonicalPath()+"\n");
-					configLogger.info("Creating Pruner Libperceptron model "+getFile(".pmoo").getAbsolutePath()+"\n");
-				}
-//			    ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getConfigNameFile(".pmoo").getAbsolutePath())));
-				ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getFile(".pmoo").getAbsolutePath())));
-		        try{
-		          output.writeObject(pmodel);
-		        } finally {
-		          output.close();
-		        }
-			} catch (OutOfMemoryError e) {
-				throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
-			} catch (IllegalArgumentException e) {
-				throw new LibException("The LibPruneandscore learner was not able to redirect Standard Error stream. ", e);
-			} catch (SecurityException e) {
-				throw new LibException("The LibPruneandscore learner cannot remove the instance file. ", e);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new LibException("The LibPruneandscore learner cannot save the model file '"+getFile(".pmoo").getAbsolutePath()+"'. ", e);
-			}
-			return;
-		}
-		else if ((getLibMode() == LearningMethod.LEARN || getLibMode() ==  SLEARN ) && model != null) {
-			try {
-				if (configLogger.isInfoEnabled()) {
-//					configLogger.info("Creating Libperceptron model "+getConfigNameFile(".pmoo").getCanonicalPath()+"\n");
-					configLogger.info("Saving Scorer Libperceptron model "+getFile(".moo").getAbsolutePath()+"\n");
-				}
-//			    ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getConfigNameFile(".pmoo").getAbsolutePath())));
-				ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getFile(".moo").getAbsolutePath())));
-		        try{
-		          output.writeObject(model);
-		        } finally {
-		          output.close();
-		        }
-			} catch (OutOfMemoryError e) {
-				throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
-			} catch (IllegalArgumentException e) {
-				throw new LibException("The LibPruneandscore learner was not able to redirect Standard Error stream. ", e);
-			} catch (SecurityException e) {
-				throw new LibException("The LibPruneandscore learner cannot remove the instance file. ", e);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new LibException("The LibPruneandscore learner cannot save the model file '"+getFile(".moo").getAbsolutePath()+"'. ", e);
-			}
-			return;
-		}
 		
 	}
 	
