@@ -311,7 +311,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 		
 		// Get topK predictions
 		ArrayList<Integer> prunedPredictions = new ArrayList<Integer>();
-		for(int i = 0; i < scoreList[0].length && prunedPredictions.size() <= getK(); i++)
+		for(int i = 0; i < scoreList[0].length && prunedPredictions.size() < getK(); i++)
 			prunedPredictions.add((int)scoreList[0][i]);
 		
 		// get least cost Predicted Action in topKPredictions
