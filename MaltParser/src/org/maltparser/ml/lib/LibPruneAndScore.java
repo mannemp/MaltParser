@@ -28,6 +28,7 @@ import org.maltparser.core.feature.FeatureVector;
 import org.maltparser.core.feature.value.FeatureValue;
 import org.maltparser.core.feature.value.MultipleFeatureValue;
 import org.maltparser.core.feature.value.SingleFeatureValue;
+import org.maltparser.core.helper.HashSet;
 import org.maltparser.core.helper.NoPrintStream;
 import org.maltparser.core.helper.Util;
 import org.maltparser.core.symbol.SymbolTable;
@@ -66,47 +67,10 @@ public class LibPruneAndScore extends Lib {
 				model = new SinglePerceptronModel(featureMap, Integer.MAX_VALUE,exploreAfterIter,exploreProb);
 				pmodel = null;
 			}
-			else if(getLibMode() == PLEARN)
+			else if(getLibMode() == PLEARN || getLibMode() == SLEARN)
 			{
-				model = null;
-				pmodel = new ManageCVPerceptron(featureMap, pruneTopK, pruneCV,exploreAfterIter,exploreProb,learnerMode);
-			}
-			else if(getLibMode() == PEVAL)
-			{
-				ObjectInputStream pinput = new ObjectInputStream(getInputStreamFromConfigFileEntry(prepSuffix+".pmoo"));
-			    try {
-			    	pmodel = (MaltPerceptronModel)pinput.readObject();
-			    	/*if(getConfiguration().getOptionValue("pruneandscore","pasprunek") !=null){
-						String pk = getConfiguration().getOptionValue("pruneandscore", "pasprunek").toString();
-						pruneTopK = Integer.parseInt(pk);
-						((MaltPerceptronModel)pmodel).setK(pruneTopK);
-					}
-			    	else*/
-			    		pruneTopK = ((MaltPerceptronModel)pmodel).getK();
-			    		System.err.println("PModel:"+getFile(prepSuffix+".pmoo"));
-			    		System.err.println("Model Pruner P@K            : "+pruneTopK);
-			    } finally {
-			    	pinput.close();
-			    }
-			    model = new SinglePerceptronModel(featureMap, Integer.MAX_VALUE,exploreAfterIter,exploreProb);
-			}
-			else if(getLibMode() == SLEARN)
-			{
-				ObjectInputStream pinput = new ObjectInputStream(getInputStreamFromConfigFileEntry(prepSuffix+".pmoo"));
-			    try {
-			    	pmodel = (MaltPerceptronModel)pinput.readObject();
-			    	/*if(getConfiguration().getOptionValue("pruneandscore","pasprunek") !=null){
-						String pk = getConfiguration().getOptionValue("pruneandscore", "pasprunek").toString();
-						pruneTopK = Integer.parseInt(pk);
-						((MaltPerceptronModel)pmodel).setK(pruneTopK);
-					}
-			    	else*/
-			    		pruneTopK = ((MaltPerceptronModel)pmodel).getK();
-			    		pruneCV = ((ManageCVPerceptron)pmodel).getNCV();
-			    } finally {
-			    	pinput.close();
-			    }
-			    model = new SinglePerceptronModel(featureMap, Integer.MAX_VALUE,exploreAfterIter,exploreProb);
+				model = new SinglePerceptronModel(featureMap, 1,exploreAfterIter,exploreProb);
+				pmodel = new SinglePerceptronModel(featureMap, pruneTopK,exploreAfterIter,exploreProb);
 			}
 			else if (getLibMode() == CLASSIFY || getLibMode() == SCORE)
 			{
@@ -119,41 +83,19 @@ public class LibPruneAndScore extends Lib {
 			    	input.close();
 			    }
 			}
-			else if(getLibMode() == PRUNE)
-			{
-				ObjectInputStream pinput = new ObjectInputStream(getInputStreamFromConfigFileEntry(prepSuffix+".pmoo"));
-			    try {
-			    	pmodel = (MaltPerceptronModel)pinput.readObject();
-			    	/*if(getConfiguration().getOptionValue("pruneandscore","pasprunek") !=null){
-						String pk = getConfiguration().getOptionValue("pruneandscore", "pasprunek").toString();
-						pruneTopK = Integer.parseInt(pk);
-						((MaltPerceptronModel)pmodel).setK(pruneTopK);
-					}
-			    	else*/
-			    		pruneTopK = ((MaltPerceptronModel)pmodel).getK();
-			    } finally {
-			    	pinput.close();
-			    }
-			}
 			else if (getLibMode() == PRUNEANDSCORE)
 			{
 				ObjectInputStream pinput = new ObjectInputStream(getInputStreamFromConfigFileEntry(prepSuffix+".pmoo"));
 			    try {
 			    	pmodel = (MaltPerceptronModel)pinput.readObject();
-			    	/*if(getConfiguration().getOptionValue("pruneandscore","pasprunek") !=null){
-						String pk = getConfiguration().getOptionValue("pruneandscore", "pasprunek").toString();
-						pruneTopK = Integer.parseInt(pk);
-						((MaltPerceptronModel)pmodel).setK(pruneTopK);
-					}
-			    	else*/
-			    		pruneTopK = ((MaltPerceptronModel)pmodel).getK();
+		    		pruneTopK = ((MaltPerceptronModel)pmodel).getK();
 			    } finally {
 			    	pinput.close();
 			    }
 				ObjectInputStream input = new ObjectInputStream(getInputStreamFromConfigFileEntry(preSuffix+".moo"));
 			    try {
 			    	model = (MaltLibModel)input.readObject();
-			    	((MaltPerceptronModel)model).setK(Integer.MAX_VALUE);
+			    	((MaltPerceptronModel)model).setK(1);
 			    } finally {
 			    	input.close();
 			    }
@@ -304,9 +246,16 @@ public class LibPruneAndScore extends Lib {
 		try {
 			String decisionSettings = getConfiguration().getOptionValue("guide", "decision_settings").toString().trim();
 			SymbolTable actionTable = getConfiguration().getSymbolTables().getSymbolTable(decisionSettings);
-			((MaltPerceptronModel)curModel).setActionCodes(actionTable.getCodes());
+			// get Legal Actions
+			HashSet<Integer> permissibleActions = new HashSet<Integer>();
+			for(Integer code: actionTable.getCodes())
+				if(permissible(code.intValue()))
+					permissibleActions.add(code.intValue());
+			// set permissible actions to the model
+			((MaltPerceptronModel)curModel).setActionCodes(permissibleActions);
 //			String actionSymbol = actionTable.getSymbolCodeToString(3);//getConfiguration().getGuide().getHistory().
 			((MaltPerceptronModel)curModel).setCurrentSentNo(getCurrentSentNo());
+			
 			final int n = featureVector.size();
 			
 			// get Action Costs 
@@ -316,25 +265,23 @@ public class LibPruneAndScore extends Lib {
 				int cost = getActionCost(code,goldGraph);
 				actionCosts.put(code, cost);
 			}
-			
-			// get Legal Actions
-			ArrayList<Integer> permissibleActions = new ArrayList<Integer>();
-			for(int code: ((MaltPerceptronModel)curModel).getActionCodes())
-				if(permissible(code))
-					permissibleActions.add(code);
+
 			int[] prunedActions = new int[permissibleActions.size()];
 			int l = 0;
 			for(Integer code: permissibleActions)
 				prunedActions[l++] = code.intValue();
 			
-			
+
 			if(getLibMode() != PEVAL)
 			{ // training
 
-				if(getLibMode() == SLEARN)
-					prunedActions = predictPrune(featureVector);
 				MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
-				int nextAction = ((MaltPerceptronModel)curModel).train(actionCosts,mfns,prunedActions,curIter/2);
+				if(getLibMode() == SLEARN)
+				{
+					prunedActions = pmodel.predict(mfns,false);
+					int nextAction = ((MaltPerceptronModel)pmodel).train(actionCosts,mfns,curIter);
+				}
+				int nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,prunedActions,curIter);
 				
 //				if(actionCosts.get(decision.getDecisionCode()).intValue() !=0)
 					decision.addDecision(nextAction);
@@ -708,33 +655,22 @@ public class LibPruneAndScore extends Lib {
 	
 	@Override
 	public void saveModel(String preSuffix) throws MaltChainedException{
-		if (getLibMode() == LearningMethod.PLEARN && pmodel != null) {
+		if ((getLibMode() == LearningMethod.LEARN || getLibMode() ==  SLEARN || getLibMode() == PLEARN) && model != null) {
 			try {
-				if (configLogger.isInfoEnabled()) {
-//					configLogger.info("Creating Libperceptron model "+getConfigNameFile(".pmoo").getCanonicalPath()+"\n");
-					configLogger.info("Creating Pruner Libperceptron model "+getFile(preSuffix+".pmoo").getAbsolutePath()+"\n");
+				if(getLibMode() != LearningMethod.LEARN)
+				{
+					if (configLogger.isInfoEnabled()) {
+	//					configLogger.info("Creating Libperceptron model "+getConfigNameFile(".pmoo").getCanonicalPath()+"\n");
+						configLogger.info("Saving Pruner Libperceptron model "+getFile(preSuffix+".pmoo").getAbsolutePath()+"\n");
+					}
+	//			    ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getConfigNameFile(".pmoo").getAbsolutePath())));
+					ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getFile(preSuffix+".pmoo").getAbsolutePath())));
+			        try{
+			          output.writeObject(pmodel);
+			        } finally {
+			          output.close();
+			        }
 				}
-//			    ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getConfigNameFile(".pmoo").getAbsolutePath())));
-				ObjectOutputStream output = new ObjectOutputStream (new BufferedOutputStream(new FileOutputStream(getFile(preSuffix+".pmoo").getAbsolutePath())));
-		        try{
-		          output.writeObject(pmodel);
-		        } finally {
-		          output.close();
-		        }
-			} catch (OutOfMemoryError e) {
-				throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
-			} catch (IllegalArgumentException e) {
-				throw new LibException("The LibPruneandscore learner was not able to redirect Standard Error stream. ", e);
-			} catch (SecurityException e) {
-				throw new LibException("The LibPruneandscore learner cannot remove the instance file. ", e);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new LibException("The LibPruneandscore learner cannot save the model file '"+getFile(".pmoo").getAbsolutePath()+"'. ", e);
-			}
-			return;
-		}
-		else if ((getLibMode() == LearningMethod.LEARN || getLibMode() ==  SLEARN ) && model != null) {
-			try {
 				if (configLogger.isInfoEnabled()) {
 //					configLogger.info("Creating Libperceptron model "+getConfigNameFile(".pmoo").getCanonicalPath()+"\n");
 					configLogger.info("Saving Scorer Libperceptron model "+getFile(preSuffix+".moo").getAbsolutePath()+"\n");

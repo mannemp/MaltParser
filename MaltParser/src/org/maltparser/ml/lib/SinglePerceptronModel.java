@@ -310,15 +310,18 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 			System.err.println("Can't find a 0 cost action");*/
 		
 		// get Top Predicted Action in prunedList
-    	int bestPredictedAction = 1;
-    	for(int i = 0; i < scoreList[0].length ; i++)
+    	int bestPredictedAction = prunedList[0];
+    	for(int i = 0; i < scoreList[0].length && i < getK(); i++)
     	{
     		for(int pcode : prunedList)
     		{
-    			if(pcode == (int)scoreList[0][i])
+    			if(pcode == (int)scoreList[0][i] )
     			{
-    				bestPredictedAction = pcode;
-    				i = scoreList[0].length;
+    				if(actionCosts.get(pcode) == bestAllowedCodeCost)
+    				{
+    					bestPredictedAction = pcode;
+    					i = scoreList[0].length;
+    				}
     				break;
     			}
     		}
@@ -420,7 +423,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
     	FeatureList goldFeats = new FeatureList();
 		
     	boolean found = false;
-    	for(int i = 0; i < predictionList.length && i < inTopK; i++)
+    	for(int i = 0; i < predictionList.length && i < getK(); i++)
     	{
     		if(predictionList[i] == truecode)
     		{
@@ -436,7 +439,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 			allround ++;
 		}
 		
-    	for(int i = 0 ; i < inTopK && i < predictionList.length; i++)
+    	for(int i = 0 ; i < getK() && i < predictionList.length; i++)
     	{
     		/*if(predictionList[i] == truecode)
     			break;*/
