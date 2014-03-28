@@ -273,8 +273,8 @@ public class TabReader implements SyntaxGraphReader {
 	}
 
 	public void setNIterations(int iterations) {
-//		nIterations = iterations > 1 ? iterations*2+1 : iterations;
-		nIterations = iterations;
+		nIterations = iterations*2;
+//		nIterations = iterations;
 	}
 
 	public int getIterationCounter() {

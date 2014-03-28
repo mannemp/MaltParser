@@ -44,7 +44,7 @@
 	<property name="jar.dest" value="${dist.dir}/lib"/>
 
 	<!-- The jar file that the jar task will generate -->
-	<property name="jar.filename" value="maltparser-pas-each-state.jar"/> 
+	<property name="jar.filename" value="maltparser-pas-alternate-iterations.jar"/> 
 	<!-- <property name="jar.filename" value="maltparser-cmlWtAveragedByFinalNoOfSteps.jar"/> -->
 
 	<!-- Application data -->

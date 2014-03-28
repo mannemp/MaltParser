@@ -279,6 +279,7 @@ public class LibPruneAndScore extends Lib {
 			if(getLibMode() != PEVAL)
 			{ // training
 				
+				int nextAction;
 				if(getLibMode() == SLEARN || getLibMode() == PLEARN)
 				{
 					int[] prunedActions = pmodel.predict(mfns,false);
@@ -287,9 +288,13 @@ public class LibPruneAndScore extends Lib {
 					for(int i = 0; i < len ; i++)
 						topKActions[i] = prunedActions[i];
 
-					int nextAction = ((MaltPerceptronModel)pmodel).train(actionCosts,mfns,curIter);
+					if(curIter%2 == 1)
+						nextAction = ((MaltPerceptronModel)pmodel).train(actionCosts,mfns,curIter);
+					else
+						nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,topKActions,curIter);
 				}
-				int nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,topKActions,curIter);
+				else
+					nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,topKActions,curIter);
 				
 //				if(actionCosts.get(decision.getDecisionCode()).intValue() !=0)
 					decision.addDecision(nextAction);
