@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.maltparser.core.exception.MaltChainedException;
 import org.maltparser.core.syntaxgraph.DependencyStructure;
-
+import org.maltparser.parser.algorithm.nivre.NivreConfig;
 import org.maltparser.parser.guide.ClassifierGuide;
 import org.maltparser.parser.guide.OracleGuide;
 import org.maltparser.parser.guide.SingleGuide;

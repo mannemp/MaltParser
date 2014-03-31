@@ -39,6 +39,7 @@ import org.maltparser.ml.LearningMethod;
 import org.maltparser.parser.Trainer;
 import org.maltparser.parser.algorithm.nivre.ArcEager;
 import org.maltparser.parser.algorithm.nivre.NivreConfig;
+import org.maltparser.parser.evaluation.Evaluate;
 import org.maltparser.parser.guide.instance.InstanceModel;
 import org.maltparser.parser.history.action.SingleDecision;
 import org.maltparser.parser.history.kbest.Candidate;
@@ -531,7 +532,6 @@ public class LibPruneAndScore extends Lib {
 					actionList = predict(featureVector);
 				}
 				decision.getKBestList().addList(actionList);
-//				decision.getKBestList().addList(predictPruneAndScore(featureVector));
 //				decision.getKBestList().addList(predictPrune(featureVector));
 			}
 			catch(Exception e){
@@ -562,13 +562,24 @@ public class LibPruneAndScore extends Lib {
 		}
 		MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 		try {
+			HashMap<Integer,Integer> actionCosts = new HashMap<Integer,Integer>();
+			if(((PruneAndScore)getConfiguration()).goldGraph != null)
+			{	// get Action Costs 
+				for(int code:((MaltPerceptronModel)model).getActionCodes())
+				{
+					int cost = getActionCost(code,((PruneAndScore)getConfiguration()).goldGraph);
+					actionCosts.put(code, cost);
+				}
+			}
+			
 			int[] prunedActions = pmodel.predict(mfns,false);
 			int len = pmodel.getK() > prunedActions.length ? prunedActions.length : pmodel.getK();
 			int[] topKActions = new int[len];
 			for(int i = 0; i < len ; i++)
 				topKActions[i] = prunedActions[i];
-			
+			((PruneAndScore)getConfiguration()).evaluator.evaluatePAction(actionCosts, topKActions);
 			int[] pasActions = ((MaltPerceptronModel)model).predict(mfns,topKActions,true);
+			((PruneAndScore)getConfiguration()).evaluator.evaluateSAction(actionCosts, pasActions[0]);
 			
 			return pasActions;
 		} catch (OutOfMemoryError e) {
