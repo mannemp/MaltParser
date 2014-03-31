@@ -591,12 +591,28 @@ public class LibPruneAndScore extends Lib {
 		}
 		MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 		try {
+			HashMap<Integer,Integer> actionCosts = new HashMap<Integer,Integer>();
+			if(((PruneAndScore)getConfiguration()).goldGraph != null)
+			{	// get Action Costs 
+				for(int code:((MaltPerceptronModel)model).getActionCodes())
+				{
+					int cost = getActionCost(code,((PruneAndScore)getConfiguration()).goldGraph);
+					actionCosts.put(code, cost);
+				}
+			}
 			int[] pruneList = new int[0];
 			pruneList = pmodel.predict(mfns,true);//scorePredict(mfns);
+			int len = pmodel.getK() > pruneList.length ? pruneList.length : pmodel.getK();
+			int[] topKActions = new int[len];
+			for(int i = 0; i < len ; i++)
+				topKActions[i] = pruneList[i];
+			((PruneAndScore)getConfiguration()).evaluator.evaluatePAction(actionCosts, topKActions);
+			
+			
 			double[][] scoreList = new double[2][0]; 
 			scoreList = model.scorePredict(mfns,true);
 			
-			int len = pmodel.getK() > pruneList.length ? pruneList.length : pmodel.getK();
+			len = pmodel.getK() > pruneList.length ? pruneList.length : pmodel.getK();
 
 			int[] finalList = new int[len];
 			int k = 0;
@@ -608,6 +624,8 @@ public class LibPruneAndScore extends Lib {
 					if(Double.compare((double)pcode, scoreList[0][i]) == 0)
 						finalList[k++] = (int)scoreList[0][i];
 			}
+			((PruneAndScore)getConfiguration()).evaluator.evaluateSAction(actionCosts, finalList[0]);
+			
 			/*int[] retList = new int[scoreList[0].length];
 			k = 0;
 			for(double code:scoreList[0])

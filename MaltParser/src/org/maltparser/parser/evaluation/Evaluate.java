@@ -35,7 +35,16 @@ public class Evaluate {
 	protected HashMap<Integer,Double> iterLCAS; // Labeled Complete Attachment Score
 	protected HashMap<Integer,Double> iterActionAccuracy ; // Oracle Action Accuracy
 	protected HashMap<Integer,Double> positionActionAccuracy ; // Position Action Accuracy
-
+	
+	protected HashMap<Integer,Double> iterPActionAccuracy ; // Pruner's Action Accuracy
+	protected HashMap<Integer,Double> iterSActionAccuracy ; // Scorer's Action Accuracy
+	protected double PActionAccuracy ; // Pruner's Action Accuracy
+	protected double SActionAccuracy ; // Scorer's Action Accuracy
+	protected int totalPActions;
+	protected int correctPActions;
+	protected int totalSActions;
+	protected int correctSActions;
+	
 	public Evaluate(DataFormatInstance df)
 	{
 		dataFormatInstance = df;
@@ -47,6 +56,8 @@ public class Evaluate {
 		iterUCAS = new HashMap<Integer,Double>();
 		iterLCAS = new HashMap<Integer,Double>();
 		iterActionAccuracy = new HashMap<Integer,Double>();
+		iterPActionAccuracy = new HashMap<Integer,Double>();
+		iterSActionAccuracy = new HashMap<Integer,Double>();
 	}
 	
 	public void reset()
@@ -93,6 +104,31 @@ public class Evaluate {
 			correctActions++;
 			updateMetrics();
 			return true;
+		}
+		return false;
+	}
+	
+	public boolean evaluateSAction(HashMap<Integer,Integer> actionCosts, int predictedCode)
+	{
+		totalSActions++;
+		if(actionCosts.get(predictedCode) == 0)
+		{
+			correctSActions++;
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean evaluatePAction(HashMap<Integer,Integer> actionCosts, int[] topKActions)
+	{
+		totalPActions++;
+		for(int pcode:topKActions)
+		{
+			if(actionCosts.get(pcode) == 0)
+			{
+				correctPActions++;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -157,6 +193,8 @@ public class Evaluate {
 		LCAS = (double)correctLCompleteAttachments/totalSents;
 		UCAS = (double)correctUCompleteAttachments/totalSents;
 		ActionAccuracy = (double) correctActions/totalActions;
+		PActionAccuracy = (double) correctPActions/totalPActions;
+		SActionAccuracy = (double) correctSActions/totalSActions;
 		
 	}
 	
@@ -186,6 +224,10 @@ public class Evaluate {
 		}
 		if(totalActions != 0)
 			System.err.println("On-Traj Action Accuracy (OAS):"+ActionAccuracy+"\t\t("+correctActions+"/"+totalActions+")");
+		if(totalPActions != 0)
+			System.err.println("Pruner's Action Accuracy (PAS):"+PActionAccuracy+"\t\t("+correctPActions+"/"+totalPActions+")");
+		if(totalSActions != 0)
+			System.err.println("Scorer's Action Accuracy (SAS):"+SActionAccuracy+"\t\t("+correctSActions+"/"+totalSActions+")");
 		/*if(positionActionAccuracy.size() >0)
 			printHash("Position vs. Action Accuracy",positionActionAccuracy);*/
 	}
@@ -198,6 +240,8 @@ public class Evaluate {
 		iterUCAS.put(iteration, UCAS);
 		iterLCAS.put(iteration, LCAS);
 		iterActionAccuracy.put(iteration, ActionAccuracy);
+		iterPActionAccuracy.put(iteration, PActionAccuracy);
+		iterSActionAccuracy.put(iteration, SActionAccuracy);
 	}
 	
 	public void printHashMetrics()
@@ -213,6 +257,10 @@ public class Evaluate {
 		}
 		if(iterActionAccuracy.size() > 0)
 			printHash("On-Traj Action Accuracy (OAS):",iterActionAccuracy);
+		if(iterPActionAccuracy.size() > 0)
+			printHash("Pruner's Action Accuracy (PAS):",iterPActionAccuracy);
+		if(iterSActionAccuracy.size() > 0)
+			printHash("Scorer's Action Accuracy (SAS):",iterSActionAccuracy);
 	}
 	
 	public void printHash(String mesg, HashMap<Integer,Double> hash)
