@@ -28,8 +28,10 @@ import org.maltparser.parser.BatchTrainer;
 import org.maltparser.parser.DependencyParserConfig;
 import org.maltparser.parser.DeterministicParser;
 import org.maltparser.parser.Parser;
+import org.maltparser.parser.ParserState;
 import org.maltparser.parser.SingleMalt;
 import org.maltparser.parser.Trainer;
+import org.maltparser.parser.algorithm.nivre.NivreConfig;
 import org.maltparser.parser.evaluation.Evaluate;
 import org.maltparser.parser.guide.ClassifierGuide;
 import org.maltparser.parser.guide.OracleGuide;
@@ -65,6 +67,7 @@ public class PruneAndScore implements DependencyParserConfig {
 	protected int currentIterNo;
 	protected SingleMalt dynamicOracle;
 	public Evaluate evaluator;
+	public DependencyStructure goldGraph;
 	
 	public void initialize(int containerIndex, DataFormatInstance dataFormatInstance, ConfigurationDir configDir, int mode) throws MaltChainedException {
 
@@ -208,6 +211,11 @@ public class PruneAndScore implements DependencyParserConfig {
 				throw new MaltChainedException("The pruneandscore parse task must be supplied with at least one input terminal structure and one output dependency structure. ");
 			}
 			DependencyStructure processGraph = (DependencyStructure)arguments[0];
+			if (arguments.length > 1 && (arguments[1] instanceof DependencyStructure)) {
+				goldGraph = (DependencyStructure)arguments[1];
+				if(parser.getParserState().getConfiguration() instanceof NivreConfig)
+					((NivreConfig) parser.getParserState().getConfiguration()).setGoldArcs(goldGraph);
+			}
 			if (processGraph.hasTokens()) {
 				parser.pasParse(processGraph);
 //				((Parser)getAlgorithm()).parse(processGraph);
