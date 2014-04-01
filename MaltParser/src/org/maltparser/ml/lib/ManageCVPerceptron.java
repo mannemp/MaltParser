@@ -69,6 +69,10 @@ public class ManageCVPerceptron  extends MaltPerceptronModel implements Serializ
 		//TODO: set action codes
     }
     
+    public CVPerceptronModel getFModel()
+    {
+    	return fmodel;
+    }
     public int getK()
     {
     	return inTopK;

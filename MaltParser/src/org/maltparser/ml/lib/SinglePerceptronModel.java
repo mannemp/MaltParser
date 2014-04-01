@@ -280,7 +280,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 		int bestAllowedCodeCost = Integer.MAX_VALUE;
 		for(int code:prunedList)
 		{
-			if(actionCosts.get(code).intValue() < bestAllowedCodeCost)
+			if(actionCosts.containsKey(code) && actionCosts.get(code).intValue() < bestAllowedCodeCost)
 			{
 				bestAllowedAction = code;
 				bestAllowedCodeCost = actionCosts.get(code).intValue();
@@ -293,7 +293,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 					}
 				}
 			}
-			else if(actionCosts.get(code).intValue() == bestAllowedCodeCost)
+			else if(actionCosts.containsKey(code) && actionCosts.get(code).intValue() == bestAllowedCodeCost)
 			{
 				double curScore = 0;
 				for(int s = 0 ; s <scoreList[0].length; s++)
@@ -315,7 +315,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 			System.err.println("Can't find a 0 cost action");*/
 		
 		// get Top Predicted Action in prunedList
-    	int bestPredictedAction = 1;
+    	int bestPredictedAction = prunedList[0];
     	for(int i = 0; i < scoreList[0].length ; i++)
     	{
     		for(int pcode : prunedList)
@@ -330,7 +330,7 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
     	}
 
     	// < is not needed !! 
-    	if(actionCosts.get(bestPredictedAction).intValue() == actionCosts.get(bestAllowedAction).intValue()) 
+    	if(actionCosts.containsKey(bestPredictedAction) && actionCosts.get(bestPredictedAction).intValue() == actionCosts.get(bestAllowedAction).intValue()) 
     		return bestPredictedAction;
     	// else i.e. predictedAction's cost is greater than that of bestAllowedCode
     	

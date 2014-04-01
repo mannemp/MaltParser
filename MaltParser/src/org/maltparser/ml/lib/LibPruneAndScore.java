@@ -345,7 +345,10 @@ public class LibPruneAndScore extends Lib {
 				
 //				if(actionCosts.get(decision.getDecisionCode()).intValue() !=0)
 					decision.addDecision(nextAction);
-				
+				int pupdates = pmodel != null ? ((ManageCVPerceptron)pmodel).getFModel().getNoOfUpdates() : 0;
+				int supdates = model != null ? ((SinglePerceptronModel)model).getNoOfUpdates() : 0;
+				((PruneAndScore)getConfiguration()).evaluator.updateNoOfUpdates(pupdates,supdates);
+					
 				increaseNumberOfInstances();
 				return;
 			}
@@ -359,7 +362,7 @@ public class LibPruneAndScore extends Lib {
 				
 				for(int code:prunedActions)
 				{
-					if(actionCosts.get(code).intValue() < bestAllowedCodeCost)
+					if(actionCosts.containsKey(code) && actionCosts.get(code).intValue() < bestAllowedCodeCost)
 					{
 						bestAllowedCode = code;
 						bestAllowedCodeCost = actionCosts.get(code).intValue(); 
@@ -601,7 +604,7 @@ public class LibPruneAndScore extends Lib {
 			HashMap<Integer,Integer> actionCosts = new HashMap<Integer,Integer>();
 			if(((PruneAndScore)getConfiguration()).goldGraph != null)
 			{	// get Action Costs 
-				for(int code:((MaltPerceptronModel)model).getActionCodes())
+				for(int code:((MaltPerceptronModel)pmodel).getActionCodes())
 				{
 					int cost = getActionCost(code,((PruneAndScore)getConfiguration()).goldGraph);
 					actionCosts.put(code, cost);
@@ -680,7 +683,7 @@ public class LibPruneAndScore extends Lib {
 			HashMap<Integer,Integer> actionCosts = new HashMap<Integer,Integer>();
 			if(((PruneAndScore)getConfiguration()).goldGraph != null)
 			{	// get Action Costs 
-				for(int code:((MaltPerceptronModel)model).getActionCodes())
+				for(int code:((MaltPerceptronModel)getModel()).getActionCodes())
 				{
 					int cost = getActionCost(code,((PruneAndScore)getConfiguration()).goldGraph);
 					actionCosts.put(code, cost);
@@ -730,7 +733,7 @@ public class LibPruneAndScore extends Lib {
 			HashMap<Integer,Integer> actionCosts = new HashMap<Integer,Integer>();
 			if(((PruneAndScore)getConfiguration()).goldGraph != null)
 			{	// get Action Costs 
-				for(int code:((MaltPerceptronModel)model).getActionCodes())
+				for(int code:((MaltPerceptronModel)getModel()).getActionCodes())
 				{
 					int cost = getActionCost(code,((PruneAndScore)getConfiguration()).goldGraph);
 					actionCosts.put(code, cost);

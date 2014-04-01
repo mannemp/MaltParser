@@ -119,7 +119,7 @@ public class Evaluate {
 	public boolean evaluateSAction(HashMap<Integer,Integer> actionCosts, int predictedCode)
 	{
 		totalSActions++;
-		if(actionCosts.get(predictedCode) == 0)
+		if(actionCosts.containsKey(predictedCode) && actionCosts.get(predictedCode) == 0)
 		{
 			correctSActions++;
 			return true;
@@ -132,7 +132,7 @@ public class Evaluate {
 		totalPActions++;
 		for(int pcode:topKActions)
 		{
-			if(actionCosts.get(pcode) == 0)
+			if(actionCosts.containsKey(pcode) && actionCosts.get(pcode) == 0)
 			{
 				correctPActions++;
 				return true;

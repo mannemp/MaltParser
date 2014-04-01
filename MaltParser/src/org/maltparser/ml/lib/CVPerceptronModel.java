@@ -66,6 +66,11 @@ public class CVPerceptronModel  implements Serializable {
     	return manager.getK();
     }
     
+    public int getNoOfUpdates()
+    {
+    	return allround;
+    }
+    
     public int getNoOfActions()
     {
     	return manager.getNoOfActions();
