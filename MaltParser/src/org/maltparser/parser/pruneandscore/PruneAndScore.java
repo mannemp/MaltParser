@@ -204,8 +204,8 @@ public class PruneAndScore implements DependencyParserConfig {
 			}
 			int curIter = (1 << 9) -1 ;
 			curIter = (goldGraph.getSentenceID() & curIter) ;
-			if(getMode() == PEVAL || curIter%2 == 0)
-				evaluator.evaluate(goldGraph, systemGraph);
+//			if(getMode() == PEVAL || curIter%1 == 0)
+			evaluator.evaluate(goldGraph, systemGraph);
 		} else if (isInInferenceMode()) {
 			if (arguments.length < 1 || !(arguments[0] instanceof DependencyStructure)) {
 				throw new MaltChainedException("The pruneandscore parse task must be supplied with at least one input terminal structure and one output dependency structure. ");
@@ -232,7 +232,13 @@ public class PruneAndScore implements DependencyParserConfig {
 		if (isInInferenceMode() || mode == PEVAL)
 			evaluator.printMetrics();
 		else
+		{
+			System.out.println("ITERATION:"+(currentIterNo));
+			evaluator.printMetrics();
+			evaluator.saveMetrics(currentIterNo);
 			evaluator.printHashMetrics();
+			evaluator.reset();
+		}
 	}
 	
 	public void parse(DependencyStructure graph) throws MaltChainedException {

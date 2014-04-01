@@ -82,6 +82,11 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
     	return;
     }
     
+    public int getNoOfUpdates()
+    {
+    	return allround;
+    }
+    
     public int getK()
     {
     	return inTopK;
@@ -569,6 +574,20 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 
 	@Override
 	public double[][] scorePredict(MaltFeatureNode[] x) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int[] predict(MaltFeatureNode[] x, int[] prunedActionList,
+			boolean cmltWts) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double[][] scorePredict(MaltFeatureNode[] x, int[] prunedActionList,
+			boolean cmltWts) {
 		// TODO Auto-generated method stub
 		return null;
 	}
