@@ -82,6 +82,11 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
     	return;
     }
     
+    public int getNoOfUpdates()
+    {
+    	return allround;
+    }
+    
     public int getK()
     {
     	return inTopK;

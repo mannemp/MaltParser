@@ -45,6 +45,11 @@ public class Evaluate {
 	protected int totalSActions;
 	protected int correctSActions;
 	
+	protected double noOfSUpdates, prevnoOfSUpdates =0;
+	protected double noOfPUpdates,prevnoOfPUpdates = 0;
+	protected HashMap<Integer,Double> iterPUpdates ; // Pruner's updates
+	protected HashMap<Integer,Double> iterSUpdates; // Scorer's updates
+	
 	public Evaluate(DataFormatInstance df)
 	{
 		dataFormatInstance = df;
@@ -58,6 +63,8 @@ public class Evaluate {
 		iterActionAccuracy = new HashMap<Integer,Double>();
 		iterPActionAccuracy = new HashMap<Integer,Double>();
 		iterSActionAccuracy = new HashMap<Integer,Double>();
+		iterPUpdates = new HashMap<Integer,Double>();
+		iterSUpdates = new HashMap<Integer,Double>();
 	}
 	
 	public void reset()
@@ -69,6 +76,7 @@ public class Evaluate {
 		positionHits = new HashMap<Integer,Integer>();;
 		positionCorrectActions = new HashMap<Integer,Integer>();;
 		positionActionAccuracy = new HashMap<Integer,Double>();
+		noOfSUpdates = noOfPUpdates = 0 ;
 	}
 	
 	public boolean evaluate(int truecode, int[] list)
@@ -212,6 +220,11 @@ public class Evaluate {
 		return UAS;
 	}
 	
+	public void updateNoOfUpdates(int pupdates, int supdates)
+	{
+		noOfPUpdates = pupdates;
+		noOfSUpdates = supdates;
+	}
 	public void printMetrics()
 	{
 		if(totalSents!=0)
@@ -248,6 +261,16 @@ public class Evaluate {
 			iterPActionAccuracy.put(iteration, PActionAccuracy);
 		if(totalSActions > 0 )
 			iterSActionAccuracy.put(iteration, SActionAccuracy);
+		if(noOfSUpdates > 0 || noOfPUpdates >0)
+		{
+			iterSUpdates.put(iteration,noOfSUpdates-prevnoOfSUpdates);
+			prevnoOfSUpdates = noOfSUpdates;
+		}
+		if(noOfPUpdates > 0 || noOfSUpdates > 0)
+		{
+			iterPUpdates.put(iteration,noOfPUpdates-prevnoOfPUpdates);
+			prevnoOfPUpdates = noOfPUpdates;
+		}
 	}
 	
 	public void printHashMetrics()
@@ -267,6 +290,10 @@ public class Evaluate {
 			printHash("Pruner's Action Accuracy (PAS):",iterPActionAccuracy);
 		if(iterSActionAccuracy.size() > 0)
 			printHash("Scorer's Action Accuracy (SAS):",iterSActionAccuracy);
+		if(iterSUpdates.size() > 0)
+			printHash("No of Scorer Updates",iterSUpdates);
+		if(iterPUpdates.size() > 0)
+			printHash("No of Pruner Updates",iterPUpdates);
 	}
 	
 	public void printHash(String mesg, HashMap<Integer,Double> hash)

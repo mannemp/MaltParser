@@ -306,7 +306,7 @@ public class LibPruneAndScore extends Lib {
 							
 //				if(actionCosts.get(decision.getDecisionCode()).intValue() !=0)
 					decision.addDecision(nextAction);
-				
+				((PruneAndScore)getConfiguration()).evaluator.updateNoOfUpdates(((SinglePerceptronModel)pmodel).getNoOfUpdates(),((SinglePerceptronModel)model).getNoOfUpdates());
 				increaseNumberOfInstances();
 				return;
 			}
