@@ -198,7 +198,9 @@ public class PruneAndScore implements DependencyParserConfig {
 				throw new MaltChainedException("The pruneandscore learn task must be supplied with at least two dependency structures. ");
 			}
 			DependencyStructure systemGraph = (DependencyStructure)arguments[0]; // target
-			DependencyStructure goldGraph = (DependencyStructure)arguments[1]; // source
+			goldGraph = (DependencyStructure)arguments[1]; // source
+			if(getAlgorithm().getParserState().getConfiguration() instanceof NivreConfig)
+				((NivreConfig) getAlgorithm().getParserState().getConfiguration()).setGoldArcs(goldGraph);
 			if (systemGraph.hasTokens() && getGuide() != null) {
 				getGuide().finalizeSentence(((Trainer)getAlgorithm()).pasParse(goldGraph, systemGraph));
 			}
