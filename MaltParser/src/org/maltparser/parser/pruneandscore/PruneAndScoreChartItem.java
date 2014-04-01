@@ -145,9 +145,9 @@ public class PruneAndScoreChartItem extends ChartItem {
 						pruneAndScore.getGuide().saveModel("");
 						createConfigFile(curIter);
 					}
+					System.out.println("ITERATION:"+(curIter-1));
 					pruneAndScore.evaluator.printMetrics();
-					System.out.println("ITERATION:"+(curIter));
-					pruneAndScore.evaluator.saveMetrics(curIter);
+					pruneAndScore.evaluator.saveMetrics(curIter-1);
 					pruneAndScore.evaluator.printHashMetrics();
 					pruneAndScore.evaluator.reset();
 					pruneAndScore.currentIterNo = curIter;

@@ -232,7 +232,13 @@ public class PruneAndScore implements DependencyParserConfig {
 		if (isInInferenceMode() || mode == PEVAL)
 			evaluator.printMetrics();
 		else
+		{
+			System.out.println("ITERATION:"+(currentIterNo));
+			evaluator.printMetrics();
+			evaluator.saveMetrics(currentIterNo);
 			evaluator.printHashMetrics();
+			evaluator.reset();
+		}
 	}
 	
 	public void parse(DependencyStructure graph) throws MaltChainedException {
