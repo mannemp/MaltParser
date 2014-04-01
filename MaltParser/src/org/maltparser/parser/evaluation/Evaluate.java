@@ -65,7 +65,7 @@ public class Evaluate {
 		totalSents = totalTokens = 0;
 		correctLabels = correctLAttachments = correctLCompleteAttachments = correctUAttachments = correctUCompleteAttachments = 0;
 		LAS = UAS = LA = UCAS = LCAS = 0;
-		totalActions = correctActions = 0;
+		totalActions = correctActions = totalSActions = totalPActions = correctSActions = correctPActions = 0;
 		positionHits = new HashMap<Integer,Integer>();;
 		positionCorrectActions = new HashMap<Integer,Integer>();;
 		positionActionAccuracy = new HashMap<Integer,Double>();
@@ -234,14 +234,20 @@ public class Evaluate {
 	
 	public void saveMetrics(int iteration)
 	{
-		iterUAS.put(iteration, UAS);
-		iterLAS.put(iteration, LAS);
-		iterLA.put(iteration, LA);
-		iterUCAS.put(iteration, UCAS);
-		iterLCAS.put(iteration, LCAS);
-		iterActionAccuracy.put(iteration, ActionAccuracy);
-		iterPActionAccuracy.put(iteration, PActionAccuracy);
-		iterSActionAccuracy.put(iteration, SActionAccuracy);
+		if(totalTokens > 0)
+		{
+			iterUAS.put(iteration, UAS);
+			iterLAS.put(iteration, LAS);
+			iterLA.put(iteration, LA);
+			iterUCAS.put(iteration, UCAS);
+			iterLCAS.put(iteration, LCAS);
+		}
+		if(totalActions > 0)
+			iterActionAccuracy.put(iteration, ActionAccuracy);
+		if(totalPActions > 0 )
+			iterPActionAccuracy.put(iteration, PActionAccuracy);
+		if(totalSActions > 0 )
+			iterSActionAccuracy.put(iteration, SActionAccuracy);
 	}
 	
 	public void printHashMetrics()

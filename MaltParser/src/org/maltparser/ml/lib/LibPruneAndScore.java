@@ -288,7 +288,9 @@ public class LibPruneAndScore extends Lib {
 					topKActions = new int[len];
 					for(int i = 0; i < len ; i++)
 						topKActions[i] = prunedActions[i];
-
+					
+					((PruneAndScore)getConfiguration()).evaluator.evaluatePAction(actionCosts, topKActions);
+					
 					if(curIter%2 == 1)
 					{
 						nextAction = ((MaltPerceptronModel)pmodel).train(actionCosts,mfns,curIter);
@@ -300,7 +302,8 @@ public class LibPruneAndScore extends Lib {
 				}
 				else
 					nextAction = ((MaltPerceptronModel)model).train(actionCosts,mfns,topKActions,curIter);
-				
+				((PruneAndScore)getConfiguration()).evaluator.evaluateSAction(actionCosts, nextAction);
+							
 //				if(actionCosts.get(decision.getDecisionCode()).intValue() !=0)
 					decision.addDecision(nextAction);
 				
@@ -315,6 +318,7 @@ public class LibPruneAndScore extends Lib {
 				for(int i = 0; i < len ; i++)
 					topKActions[i] = prunedActions[i];
 
+				((PruneAndScore)getConfiguration()).evaluator.evaluatePAction(actionCosts, topKActions);
 				
 				int bestAllowedCode = prunedActions[0];
 				double bestAllowedCodeScore = Double.NEGATIVE_INFINITY; 
@@ -341,6 +345,7 @@ public class LibPruneAndScore extends Lib {
 				NivreConfig nConfig = (NivreConfig)getConfiguration().getAlgorithm().getParserState().getConfiguration();
 				int position = nConfig.getInput().peek().getIndex();
 				((PruneAndScore)getConfiguration()).evaluator.evaluate(bestAllowedCodeCost == 0 ? prunedActions[0] : 10000 , prunedActions, position);
+				((PruneAndScore)getConfiguration()).evaluator.evaluateSAction(actionCosts, bestAllowedCode);
 				
 //					if(actionCosts.get(decision.getDecisionCode()).intValue() !=0)
 					decision.addDecision(bestAllowedCode);
@@ -572,7 +577,7 @@ public class LibPruneAndScore extends Lib {
 				}
 			}
 			
-			int[] prunedActions = pmodel.predict(mfns,false);
+			int[] prunedActions = pmodel.predict(mfns,true);
 			int len = pmodel.getK() > prunedActions.length ? prunedActions.length : pmodel.getK();
 			int[] topKActions = new int[len];
 			for(int i = 0; i < len ; i++)
@@ -618,7 +623,18 @@ public class LibPruneAndScore extends Lib {
 		}
 		MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 		try {
+			HashMap<Integer,Integer> actionCosts = new HashMap<Integer,Integer>();
+			if(((PruneAndScore)getConfiguration()).goldGraph != null)
+			{	// get Action Costs 
+				for(int code:((MaltPerceptronModel)model).getActionCodes())
+				{
+					int cost = getActionCost(code,((PruneAndScore)getConfiguration()).goldGraph);
+					actionCosts.put(code, cost);
+				}
+			}
 			int[] predList = model.predict(mfns,true);
+			((PruneAndScore)getConfiguration()).evaluator.evaluateSAction(actionCosts, predList[0]);
+
 			return predList;
 		} catch (OutOfMemoryError e) {
 			throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
@@ -635,11 +651,22 @@ public class LibPruneAndScore extends Lib {
 		}
 		MaltFeatureNode[] mfns = MaltPerceptronModel.convertFVtoMFN(featureVector);
 		try {
-			int[] prunedActions = pmodel.predict(mfns,false);
+			HashMap<Integer,Integer> actionCosts = new HashMap<Integer,Integer>();
+			if(((PruneAndScore)getConfiguration()).goldGraph != null)
+			{	// get Action Costs 
+				for(int code:((MaltPerceptronModel)model).getActionCodes())
+				{
+					int cost = getActionCost(code,((PruneAndScore)getConfiguration()).goldGraph);
+					actionCosts.put(code, cost);
+				}
+			}
+			
+			int[] prunedActions = pmodel.predict(mfns,true);
 			int len = pmodel.getK() > prunedActions.length ? prunedActions.length : pmodel.getK();
 			int[] topKActions = new int[len];
 			for(int i = 0; i < len ; i++)
 				topKActions[i] = prunedActions[i];
+			((PruneAndScore)getConfiguration()).evaluator.evaluatePAction(actionCosts, topKActions);
 			return topKActions;
 		} catch (OutOfMemoryError e) {
 			throw new LibException("Out of memory. Please increase the Java heap size (-Xmx<size>). ", e);
