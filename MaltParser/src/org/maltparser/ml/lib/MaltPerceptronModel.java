@@ -29,6 +29,9 @@ public abstract class MaltPerceptronModel implements MaltLibModel{
     public abstract void train(SingleDecision decision, MaltFeatureNode[] x) throws MaltChainedException;
     public abstract void train(SingleDecision decision, MaltFeatureNode[] x, int[] pruned) throws MaltChainedException;
     
+    public abstract int[] predict(MaltFeatureNode[] x, int[] prunedActionList, boolean cmltWts);
+	public abstract double[][] scorePredict(MaltFeatureNode[] x, int[] prunedActionList, boolean cmltWts);
+	
     public static MaltFeatureNode[] convertFVtoMFN(FeatureVector featureVector)
 	{
 		MaltFeatureNode[] mfns = new MaltFeatureNode[featureVector.size()];

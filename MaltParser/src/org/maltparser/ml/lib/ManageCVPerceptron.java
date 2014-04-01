@@ -69,6 +69,10 @@ public class ManageCVPerceptron  extends MaltPerceptronModel implements Serializ
 		//TODO: set action codes
     }
     
+    public CVPerceptronModel getFModel()
+    {
+    	return fmodel;
+    }
     public int getK()
     {
     	return inTopK;
@@ -350,6 +354,20 @@ public class ManageCVPerceptron  extends MaltPerceptronModel implements Serializ
 
 	@Override
 	public double[][] scorePredict(MaltFeatureNode[] x) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int[] predict(MaltFeatureNode[] x, int[] prunedActionList,
+			boolean cmltWts) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double[][] scorePredict(MaltFeatureNode[] x, int[] prunedActionList,
+			boolean cmltWts) {
 		// TODO Auto-generated method stub
 		return null;
 	}
