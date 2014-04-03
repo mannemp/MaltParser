@@ -218,6 +218,11 @@ public class ManageCVPerceptron  extends MaltPerceptronModel implements Serializ
     	return cvmodel[cvidx].getCmltScore(feats);
     }
     
+    public double getAvgScoreFromCVModel(int cvidx, FeatureList feats)
+    {
+    	return cvmodel[cvidx].getAvgScore(feats);
+    }
+    
     public double getScoreFromFModel(FeatureList feats)
     {
     	return fmodel.getScore(feats);
@@ -226,6 +231,11 @@ public class ManageCVPerceptron  extends MaltPerceptronModel implements Serializ
     public double getCmltScoreFromFModel(FeatureList feats)
     {
     	return fmodel.getCmltScore(feats);
+    }
+    
+    public double getAvgScoreFromFModel(FeatureList feats)
+    {
+    	return fmodel.getAvgScore(feats);
     }
 
     @Override

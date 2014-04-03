@@ -26,6 +26,10 @@ public class PFeat extends MaltFeatureNode  implements Serializable{
     	return wt.returnCmlwt(allround);
     }
     
+    public double returnAvgwt(int allround){
+    	return wt.returnAvgwt(allround);
+    }
+    
     public double updateWt(double para, double allround){
     	wt.updateWt(para,allround);
     	wt.updateCmlwt(allround);

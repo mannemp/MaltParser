@@ -169,6 +169,16 @@ public class SinglePerceptronModel extends MaltPerceptronModel implements Serial
 		return score;
     }
     
+    public double  getAvgScore(FeatureList feats){
+    	double  score = 0;
+		for (int i=0; i<feats.size(); i++){
+		    int feaid = feats.get(i).index;
+		    if(id2feat.contains(feaid))
+		    	score += ((PFeat)id2feat.get(feaid)).wt.returnAvgwt(allround);//getWeight();
+		}
+		return score;
+    }
+    
     public double  getVotedScore(Vector<Integer> feats, int allround){
     	double  score = 0;
 		for (int i=0; i<feats.size(); i++){
